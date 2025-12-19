@@ -1,0 +1,29 @@
+{
+  "name": "白山比咩神社 参拝記念 2025年11月",
+  "description": "白山比咩神社にて2025年11月に賽銭を奉納された方への記念NFTです。",
+  "image": "https://osaisen.example.com/metadata/images/202511.png",
+  "external_url": "https://osaisen.example.com",
+  "attributes": [
+    {
+      "trait_type": "Year",
+      "value": 2025
+    },
+    {
+      "trait_type": "Month",
+      "value": 11
+    },
+    {
+      "display_type": "date",
+      "trait_type": "Period",
+      "value": 1761955200
+    },
+    {
+      "trait_type": "Shrine",
+      "value": "Shirayama Hime Shrine"
+    },
+    {
+      "trait_type": "Type",
+      "value": "Monthly Offering Token"
+    }
+  ]
+}

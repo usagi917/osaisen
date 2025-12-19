@@ -1,0 +1,147 @@
+@import "tailwindcss";
+
+@theme {
+  /* MD3 Color System - Dark Theme Base with Serious Pop Accents */
+  
+  /* Primary: Neon Red (Shrine) */
+  --color-md-primary: #FFB4AB;         /* Light Red for text/icons on dark */
+  --color-md-on-primary: #690005;      /* Dark Red for text on primary */
+  --color-md-primary-container: #930006; /* Deep Red for filled buttons */
+  --color-md-on-primary-container: #FFDAD6; /* Lightest Red */
+
+  /* Secondary: Gold/Lime (Fortune) */
+  --color-md-secondary: #D7C986;
+  --color-md-on-secondary: #3A3000;
+  --color-md-secondary-container: #514600;
+  --color-md-on-secondary-container: #F4E59F;
+
+  /* Custom Blue: (New for Wallet) */
+  --color-md-blue: #A2C9FF;
+  --color-md-on-blue: #00315B;
+  --color-md-blue-container: #004881;
+  --color-md-on-blue-container: #D1E4FF;
+  
+  /* Tertiary: Electric Purple (Mystery) */
+  --color-md-tertiary: #D0BCFF;
+  --color-md-on-tertiary: #381E72;
+  --color-md-tertiary-container: #4F378B;
+  --color-md-on-tertiary-container: #EADDFF;
+
+  /* Error */
+  --color-md-error: #FFB4AB;
+  --color-md-on-error: #690005;
+  --color-md-error-container: #930006;
+  --color-md-on-error-container: #FFDAD6;
+
+  /* Surface (Dark Mode) */
+  --color-md-surface: #141212;         /* Base Background */
+  --color-md-on-surface: #E6E1E5;      /* Main Text */
+  --color-md-on-surface-variant: #CAC4D0; /* Muted Text */
+  --color-md-outline: #938F99;         /* Borders */
+  --color-md-outline-variant: #49454F; /* Faint Borders */
+  
+  /* Surface Containers (Elevation by Tone) */
+  --color-md-surface-container-lowest: #0F0D0D;
+  --color-md-surface-container-low: #1D1B20;
+  --color-md-surface-container: #211F26;       /* Standard Card */
+  --color-md-surface-container-high: #2B2930;
+  --color-md-surface-container-highest: #36343B;
+
+  /* Typography */
+  --font-family-sans: 'Roboto', 'Noto Sans JP', sans-serif;
+  --font-family-display: 'Inter', sans-serif;
+}
+
+:root {
+  font-family: var(--font-family-sans);
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--color-md-on-surface);
+  background-color: var(--color-md-surface);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  /* Subtle gradient mesh compatible with MD3 */
+  background: radial-gradient(circle at 50% 0%, rgba(147, 0, 6, 0.15), transparent 60%),
+              var(--color-md-surface);
+  overflow-x: hidden;
+}
+
+/* MD3 Elevation & State Layers */
+.md-card {
+  background-color: var(--color-md-surface-container);
+  border-radius: 1.5rem; /* 24px - Medium/Large Card */
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+
+.md-card-elevated {
+  background-color: var(--color-md-surface-container-low);
+  box-shadow: 0 4px 8px 3px rgba(0, 0, 0, 0.15); /* MD3 Elevation 1 */
+}
+
+/* MD3 State Layer (Hover overlay) */
+.state-layer {
+  position: relative;
+  overflow: hidden;
+}
+
+.state-layer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: currentColor;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.state-layer:hover::before {
+  opacity: 0.08;
+}
+
+.state-layer:active::before {
+  opacity: 0.12;
+}
+
+/* Typography Utilities */
+.type-display-large {
+  font-family: var(--font-family-display);
+  font-size: 3.56rem; /* 57px */
+  line-height: 1.12;
+  letter-spacing: -0.25px;
+  font-weight: 400;
+}
+
+.type-headline-medium {
+  font-family: var(--font-family-sans);
+  font-size: 1.75rem; /* 28px */
+  line-height: 1.28;
+  font-weight: 400;
+}
+
+.type-label-large {
+  font-family: var(--font-family-sans);
+  font-size: 0.875rem; /* 14px */
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+}
+
+/* Hide scrollbar */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* WalletConnect Modal - 最前面に表示 */
+wcm-modal,
+w3m-modal,
+[data-testid="wallet-connect-modal"] {
+  z-index: 9999 !important;
+}
