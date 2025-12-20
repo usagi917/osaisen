@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useAccount } from 'wagmi';
+import { useState, useEffect, useRef } from 'react';
+import { useAccount, useSwitchChain } from 'wagmi';
+import { polygonAmoy } from 'wagmi/chains';
 import { parseUnits } from 'viem';
 import { motion } from 'framer-motion';
 import { WalletConnect } from '../components/WalletConnect';
@@ -16,10 +17,32 @@ const MIN_AMOUNT = 115; // 115 JPYC
 
 export function SaisenPage() {
   const { address, isConnected, chainId } = useAccount();
+  const { switchChain } = useSwitchChain();
   const [amount, setAmount] = useState(MIN_AMOUNT);
   const [showResult, setShowResult] = useState(false);
+  const autoSwitchAttemptedRef = useRef(false);
 
-  const currentChainId = chainId || 80002; // Default to Amoy
+  const amoyChainId = polygonAmoy.id;
+
+  const currentChainId = chainId ?? amoyChainId;
+
+  // Auto-switch to Amoy on connect (one attempt per connection)
+  useEffect(() => {
+    if (!isConnected) {
+      autoSwitchAttemptedRef.current = false;
+      return;
+    }
+
+    if (chainId === amoyChainId) {
+      autoSwitchAttemptedRef.current = true;
+      return;
+    }
+
+    if (!autoSwitchAttemptedRef.current && chainId != null) {
+      switchChain({ chainId: amoyChainId });
+      autoSwitchAttemptedRef.current = true;
+    }
+  }, [isConnected, chainId, amoyChainId, switchChain]);
 
   // Hooks
   const {
