@@ -132,8 +132,7 @@ export function SaisenPage() {
               <div className="absolute inset-0 bg-md-primary blur-3xl opacity-20 animate-pulse" />
               <h2 className="type-display-large font-black relative drop-shadow-lg">
                 DIGITAL<br />
-                <span className="text-md-primary">O
-                  SAISEN</span>
+                <span className="text-md-primary">OSAISEN</span>
               </h2>
             </div>
             <p className="text-md-on-surface-variant type-headline-medium !text-lg !font-medium leading-relaxed max-w-xs mx-auto">
