@@ -12,7 +12,13 @@
     "deploy:amoy": "hardhat run scripts/deploy-amoy.ts --network amoy",
     "deploy:mainnet": "hardhat run scripts/deploy.ts --network polygon",
     "test:userop": "npx ts-node scripts/test-userOp.ts",
-    "metadata:generate": "npx ts-node scripts/generate-metadata.ts"
+    "metadata:generate": "npx ts-node scripts/generate-metadata.ts",
+    "monitor:treasury": "hardhat run scripts/monitor-treasury.ts",
+    "monitor:treasury:amoy": "hardhat run scripts/monitor-treasury.ts --network amoy -- --once",
+    "monitor:treasury:polygon": "hardhat run scripts/monitor-treasury.ts --network polygon -- --once",
+    "monitor:paymaster": "npx ts-node scripts/monitor-paymaster.ts --once",
+    "monitor:paymaster:amoy": "npx ts-node scripts/monitor-paymaster.ts --network=amoy --once",
+    "monitor:paymaster:polygon": "npx ts-node scripts/monitor-paymaster.ts --network=polygon --once"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-chai-matchers": "^2.1.0",

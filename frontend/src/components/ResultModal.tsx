@@ -72,7 +72,7 @@ export function ResultModal({
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", bounce: 0.5, duration: 0.8 }}
-                className="w-20 h-20 bg-md-primary-container rounded-full flex items-center justify-center mb-6 text-md-on-primary-container shadow-lg"
+                className="w-20 h-20 bg-md-blue-container rounded-full flex items-center justify-center mb-6 text-md-on-blue-container shadow-lg"
               >
                 <Check size={40} className="stroke-[3]" />
               </motion.div>
@@ -81,7 +81,7 @@ export function ResultModal({
               <p className="text-md-on-surface-variant text-sm mb-8">Thank you for your donation</p>
 
               <div className="text-center mb-8">
-                <span className="type-display-large text-md-primary font-medium">
+                <span className="type-display-large text-white font-medium">
                   {amount.toLocaleString()}
                 </span>
                 <span className="type-headline-medium text-md-on-surface-variant ml-2">JPYC</span>
@@ -127,7 +127,7 @@ export function ResultModal({
                   </a>
                 )}
                 {/* Share Button (Filled Button) */}
-                <button className="flex-1 h-12 rounded-full bg-md-primary-container text-md-on-primary-container flex items-center justify-center gap-2 hover:shadow-md transition-all state-layer text-sm font-medium">
+                <button className="flex-1 h-12 rounded-full bg-md-blue-container text-md-on-blue-container flex items-center justify-center gap-2 hover:shadow-md transition-all state-layer text-sm font-medium">
                   <Share2 size={18} />
                   シェア
                 </button>

@@ -67,10 +67,12 @@ export function SaisenPage() {
   // Show result modal after confirmation
   useEffect(() => {
     if (isConfirmed && saisenResult) {
-      setShowResult(true);
       refetchEligibility();
     }
   }, [isConfirmed, saisenResult, refetchEligibility]);
+
+  // Derive showResult from confirmation state
+  const shouldShowResult = showResult || (isConfirmed && saisenResult != null);
 
   const handleCloseResult = () => {
     setShowResult(false);
@@ -107,7 +109,8 @@ export function SaisenPage() {
               <div className="absolute inset-0 bg-md-primary blur-3xl opacity-20 animate-pulse" />
               <h2 className="type-display-large font-black relative drop-shadow-lg">
                 DIGITAL<br />
-                <span className="text-md-primary">SAISEN</span>
+                <span className="text-md-primary">O
+                  SAISEN</span>
               </h2>
             </div>
             <p className="text-md-on-surface-variant type-headline-medium !text-lg !font-medium leading-relaxed max-w-xs mx-auto">
@@ -169,13 +172,13 @@ export function SaisenPage() {
       {/* Footer Minimal */}
       <footer className="mt-8 text-center pb-safe">
         <p className="text-xs text-md-on-surface-variant opacity-60 font-mono">
-          POWERED BY JPYC & POLYGON
+          POWERED BY kuroko 
         </p>
       </footer>
 
       {/* Result Modal */}
       <ResultModal
-        isOpen={showResult}
+        isOpen={shouldShowResult}
         onClose={handleCloseResult}
         amount={amount}
         monthId={saisenResult?.monthId}

@@ -42,7 +42,7 @@ export function SaisenButton({
   const state = getButtonState();
 
   const styles = {
-    primary: 'bg-md-primary-container text-md-on-primary-container hover:shadow-md',
+    primary: 'bg-md-blue-container text-md-on-blue-container hover:shadow-md',
     secondary: 'bg-md-secondary-container text-md-on-secondary-container hover:shadow-md',
     loading: 'bg-md-surface-container-highest text-md-on-surface-variant cursor-wait opacity-80',
     disabled: 'bg-md-surface-container-high text-md-on-surface-variant/50 cursor-not-allowed',
