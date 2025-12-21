@@ -53,16 +53,16 @@ export function WalletConnect() {
     return (
       <div className="relative">
         {showConnectors && <Backdrop />}
-        <motion.button 
+        <motion.button
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           onClick={() => setShowConnectors(!showConnectors)}
-          className="relative z-50 h-10 pl-4 pr-2 rounded-full bg-md-surface-container-high text-md-on-surface-variant flex items-center gap-2 text-sm font-medium transition-all hover:bg-md-surface-container-highest state-layer"
+          className="relative z-50 h-8 sm:h-10 pl-3 sm:pl-4 pr-1.5 sm:pr-2 rounded-full bg-md-surface-container-high text-md-on-surface-variant flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium transition-all hover:bg-md-surface-container-highest state-layer"
         >
-          <div className="w-2 h-2 rounded-full bg-md-secondary animate-pulse" />
+          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-md-secondary animate-pulse" />
           <span className="font-mono tracking-wide">{shortAddress}</span>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center ml-1">
-            <ChevronRight size={16} className={`transition-transform duration-200 ${showConnectors ? 'rotate-90' : ''}`} />
+          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center">
+            <ChevronRight size={14} className={`sm:w-4 sm:h-4 transition-transform duration-200 ${showConnectors ? 'rotate-90' : ''}`} />
           </div>
         </motion.button>
 
@@ -72,14 +72,14 @@ export function WalletConnect() {
               initial={{ opacity: 0, y: 8, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.95 }}
-              className="absolute right-0 top-12 min-w-[200px] bg-md-surface-container rounded-2xl shadow-xl border border-md-outline-variant/20 overflow-hidden z-50 p-2"
+              className="absolute right-0 top-10 sm:top-12 min-w-[180px] sm:min-w-[200px] bg-md-surface-container rounded-2xl shadow-xl border border-md-outline-variant/20 overflow-hidden z-50 p-2"
             >
               <button
                 onClick={handleDisconnect}
-                className="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-md-error hover:bg-md-error-container/10 transition-colors"
+                className="w-full text-left px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl flex items-center gap-2.5 sm:gap-3 text-md-error hover:bg-md-error-container/10 transition-colors"
               >
-                <LogOut size={18} />
-                <span className="text-sm font-medium">切断する</span>
+                <LogOut size={16} className="sm:w-[18px] sm:h-[18px]" />
+                <span className="text-xs sm:text-sm font-medium">切断する</span>
               </button>
             </motion.div>
           )}
@@ -101,22 +101,22 @@ export function WalletConnect() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setShowConnectors(true)}
-            className="h-10 px-6 rounded-full bg-blue-600 text-white font-medium text-sm flex items-center gap-2 shadow-sm hover:bg-blue-700 hover:shadow-md transition-all state-layer"
+            className="h-8 sm:h-10 px-4 sm:px-6 rounded-full bg-blue-600 text-white font-medium text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 shadow-sm hover:bg-blue-700 hover:shadow-md transition-all state-layer"
           >
-            <Wallet size={18} />
-            ウォレット接続
+            <Wallet size={16} className="sm:w-[18px] sm:h-[18px]" />
+            接続
           </motion.button>
         ) : (
-          <motion.div 
+          <motion.div
             key="connector-list"
-            initial={{ opacity: 0, scale: 0.9, y: -20 }}
+            initial={{ opacity: 0, scale: 0.95, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: -20 }}
-            className="absolute right-0 top-0 w-80 bg-md-surface-container rounded-3xl p-4 flex flex-col gap-3 shadow-xl border border-md-outline-variant/20 z-50 origin-top-right"
+            exit={{ opacity: 0, scale: 0.95, y: -10 }}
+            className="fixed inset-x-4 top-4 sm:absolute sm:inset-auto sm:right-0 sm:top-0 w-auto sm:w-80 bg-md-surface-container rounded-2xl sm:rounded-3xl p-3 sm:p-4 flex flex-col gap-2 sm:gap-3 shadow-xl border border-md-outline-variant/20 z-50 sm:origin-top-right max-h-[85vh] overflow-y-auto"
           >
-            <div className="flex justify-between items-center px-2 py-2 mb-2">
+            <div className="flex justify-between items-center px-1 sm:px-2 py-1 sm:py-2 mb-1 sm:mb-2">
               <span className="text-sm font-medium text-md-on-surface">ウォレットを選択</span>
-              <button 
+              <button
                 onClick={() => setShowConnectors(false)}
                 className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-md-surface-container-highest text-md-on-surface-variant transition-colors"
               >
@@ -126,7 +126,7 @@ export function WalletConnect() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <div className="px-2">
+              <div className="px-1 sm:px-2">
                 <p className="text-xs font-semibold tracking-wide text-md-secondary">おすすめ</p>
               </div>
               <button
@@ -135,18 +135,18 @@ export function WalletConnect() {
                   if (!walletConnectConnector) return;
                   handleConnect(walletConnectConnector, true);
                 }}
-                className="flex items-center justify-between w-full p-4 rounded-2xl text-left text-white bg-blue-600 hover:bg-blue-700 transition-colors state-layer disabled:opacity-60"
+                className="flex items-center justify-between w-full p-3 sm:p-4 rounded-xl sm:rounded-2xl text-left text-white bg-blue-600 hover:bg-blue-700 transition-colors state-layer disabled:opacity-60"
               >
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm font-bold">HashPort Wallet</span>
-                  <span className="text-xs text-blue-100">
+                <div className="flex flex-col gap-0.5 sm:gap-1">
+                  <span className="text-xs sm:text-sm font-bold">HashPort Wallet</span>
+                  <span className="text-[10px] sm:text-xs text-blue-100">
                     {mobile ? 'タップして接続手順を表示' : 'QRコードをスキャンして接続'}
                   </span>
                 </div>
-                <ChevronRight size={16} className="text-blue-100" />
+                <ChevronRight size={16} className="text-blue-100 shrink-0" />
               </button>
               {mobile && (
-                <div className="px-2 py-2 text-[11px] leading-relaxed text-md-on-surface-variant bg-md-surface-container-high rounded-xl">
+                <div className="px-2 py-2 text-[10px] sm:text-[11px] leading-relaxed text-md-on-surface-variant bg-md-surface-container-high rounded-xl">
                   <p className="font-semibold mb-1">スマホでの接続手順:</p>
                   <ol className="list-decimal list-inside space-y-0.5">
                     <li>上のボタンをタップ</li>
@@ -157,7 +157,7 @@ export function WalletConnect() {
                 </div>
               )}
               {!isWalletConnectEnabled && (
-                <div className="px-2 text-[11px] leading-snug text-md-error">
+                <div className="px-2 text-[10px] sm:text-[11px] leading-snug text-md-error">
                   WalletConnectのProject IDが未設定です。frontend/.env に
                   VITE_WALLETCONNECT_PROJECT_ID を設定してください。
                 </div>
@@ -166,8 +166,8 @@ export function WalletConnect() {
 
             <div className="h-px bg-md-outline-variant/30 my-1" />
 
-            <div className="flex flex-col gap-2 max-h-[50vh] overflow-y-auto no-scrollbar">
-              <div className="px-2">
+            <div className="flex flex-col gap-2 max-h-[40vh] sm:max-h-[50vh] overflow-y-auto no-scrollbar">
+              <div className="px-1 sm:px-2">
                 <p className="text-xs font-semibold tracking-wide text-md-on-surface-variant">その他のウォレット</p>
               </div>
               <div className="flex flex-col gap-1">
@@ -175,9 +175,9 @@ export function WalletConnect() {
                   <button
                     onClick={() => handleConnect(metaMaskConnector)}
                     disabled={isPending}
-                    className="flex items-center justify-between w-full p-3 rounded-xl text-left text-md-on-surface hover:bg-md-surface-container-high transition-colors state-layer group"
+                    className="flex items-center justify-between w-full p-2.5 sm:p-3 rounded-xl text-left text-md-on-surface hover:bg-md-surface-container-high transition-colors state-layer group"
                   >
-                    <span className="text-sm font-medium group-hover:text-md-primary transition-colors">MetaMask</span>
+                    <span className="text-xs sm:text-sm font-medium group-hover:text-md-primary transition-colors">MetaMask</span>
                     <ChevronRight size={16} className="text-md-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity" />
                   </button>
                 )}
@@ -185,7 +185,7 @@ export function WalletConnect() {
             </div>
 
             {error && (
-              <div className="mt-1 px-2 text-[11px] text-md-error">
+              <div className="mt-1 px-2 text-[10px] sm:text-[11px] text-md-error">
                 {error.message}
               </div>
             )}

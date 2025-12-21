@@ -51,15 +51,15 @@ function AppShell() {
   );
 
   return (
-    <div className="min-h-[100dvh] relative flex flex-col p-6 max-w-lg mx-auto bg-md-surface text-md-on-surface font-sans">
+    <div className="min-h-[100dvh] relative flex flex-col px-4 py-5 sm:p-6 max-w-lg mx-auto bg-md-surface text-md-on-surface font-sans">
       <AppHeader
         activePage={activePage}
         onChange={handleChangePage}
         showMyPage={canShowMyPage}
       />
       {activePage === 'saisen' ? <SaisenPage /> : <MyPage />}
-      <footer className="mt-8 text-center pb-safe">
-        <p className="text-xs text-md-on-surface-variant opacity-60 font-mono">
+      <footer className="mt-6 sm:mt-8 text-center pb-safe">
+        <p className="text-[10px] sm:text-xs text-md-on-surface-variant opacity-60 font-mono">
           POWERED BY kuroko
         </p>
       </footer>
