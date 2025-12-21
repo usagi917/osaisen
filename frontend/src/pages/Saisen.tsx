@@ -3,7 +3,6 @@ import { useAccount, useSwitchChain } from 'wagmi';
 import { polygonAmoy } from 'wagmi/chains';
 import { parseUnits } from 'viem';
 import { motion } from 'framer-motion';
-import { WalletConnect } from '../components/WalletConnect';
 import { AmountInput } from '../components/AmountInput';
 import { SaisenButton } from '../components/SaisenButton';
 import { StatusDisplay } from '../components/StatusDisplay';
@@ -107,20 +106,7 @@ export function SaisenPage() {
   };
 
   return (
-    <div className="min-h-[100dvh] relative flex flex-col p-6 max-w-lg mx-auto bg-md-surface text-md-on-surface font-sans">
-      
-      {/* Navbar */}
-      <header className="flex justify-between items-center mb-8 relative z-20">
-        <div>
-          <h1 className="type-headline-medium font-bold tracking-tight leading-none text-md-primary">
-            HAKUSAN<br/>HIME
-          </h1>
-          <p className="type-label-large text-md-secondary font-bold tracking-[0.2em] mt-1 opacity-80">白山比咩神社</p>
-        </div>
-        <WalletConnect />
-      </header>
-
-      {/* Main Content */}
+    <>
       <main className="flex-1 flex flex-col justify-center relative z-10">
         {!isConnected ? (
           <motion.div 
@@ -191,13 +177,6 @@ export function SaisenPage() {
         )}
       </main>
 
-      {/* Footer Minimal */}
-      <footer className="mt-8 text-center pb-safe">
-        <p className="text-xs text-md-on-surface-variant opacity-60 font-mono">
-          POWERED BY kuroko 
-        </p>
-      </footer>
-
       {/* Result Modal */}
       <ResultModal
         isOpen={shouldShowResult}
@@ -208,6 +187,6 @@ export function SaisenPage() {
         txHash={saisenHash}
         chainId={currentChainId}
       />
-    </div>
+    </>
   );
 }
