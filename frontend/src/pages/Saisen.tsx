@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAccount, useSwitchChain } from 'wagmi';
-import { polygonAmoy } from 'wagmi/chains';
 import { parseUnits } from 'viem';
 import { motion } from 'framer-motion';
 import { AmountInput } from '../components/AmountInput';
@@ -10,6 +9,7 @@ import { ResultModal } from '../components/ResultModal';
 import { useJpycApproval } from '../hooks/useJpycApproval';
 import { useNftEligibility } from '../hooks/useNftEligibility';
 import { useSaisen } from '../hooks/useSaisen';
+import { DEFAULT_CHAIN_ID, resolveSupportedChainId } from '../lib/chains';
 import { JPYC_DECIMALS } from '../lib/contracts';
 
 const MIN_AMOUNT = 115; // 115 JPYC
@@ -21,9 +21,8 @@ export function SaisenPage() {
   const [showResult, setShowResult] = useState(false);
   const autoSwitchAttemptedRef = useRef(false);
 
-  const amoyChainId = polygonAmoy.id;
-
-  const currentChainId = chainId ?? amoyChainId;
+  const amoyChainId = DEFAULT_CHAIN_ID;
+  const currentChainId = resolveSupportedChainId(chainId);
 
   // Auto-switch to Amoy on connect (one attempt per connection)
   useEffect(() => {

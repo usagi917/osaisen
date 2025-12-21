@@ -3,10 +3,11 @@ import { usePublicClient } from 'wagmi';
 import { hardhat, polygon } from 'wagmi/chains';
 import type { Address } from 'viem';
 import { getContracts, ROUTER_ABI } from '../lib/contracts';
+import type { SupportedChainId } from '../lib/chains';
 
 interface UseGoshuinHistoryProps {
   userAddress?: Address;
-  chainId: number;
+  chainId: SupportedChainId;
 }
 
 const parseBigInt = (value?: string): bigint | null => {
@@ -20,7 +21,7 @@ const parseBigInt = (value?: string): bigint | null => {
   }
 };
 
-const getStartBlock = (chainId: number): bigint => {
+const getStartBlock = (chainId: SupportedChainId): bigint => {
   const fromEnv =
     chainId === polygon.id
       ? import.meta.env.VITE_ROUTER_START_BLOCK_MAINNET

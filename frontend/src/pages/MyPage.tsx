@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useAccount, useReadContracts, useSwitchChain } from 'wagmi';
-import { polygonAmoy } from 'wagmi/chains';
+import { DEFAULT_CHAIN_ID, resolveSupportedChainId } from '../lib/chains';
 import { motion } from 'framer-motion';
 import { BookOpen, RefreshCcw } from 'lucide-react';
 import { StatusDisplay } from '../components/StatusDisplay';
@@ -54,8 +54,8 @@ export function MyPage() {
   const { switchChain } = useSwitchChain();
   const autoSwitchAttemptedRef = useRef(false);
 
-  const amoyChainId = polygonAmoy.id;
-  const currentChainId = chainId ?? amoyChainId;
+  const amoyChainId = DEFAULT_CHAIN_ID;
+  const currentChainId = resolveSupportedChainId(chainId);
 
   useEffect(() => {
     if (!isConnected) {
