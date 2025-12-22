@@ -2,6 +2,11 @@ import { PinataSDK } from '@pinata/sdk';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
+import {
+  getTokenIdHex,
+  iterateMonthRange,
+  parseYearMonthArgs,
+} from './lib/nftDate';
 
 dotenv.config();
 
@@ -47,18 +52,18 @@ export async function uploadImageAndMetadata(
   year: number,
   month: number
 ): Promise<UploadResult> {
-  const tokenId = year * 100 + month;
+  const tokenIdHex = getTokenIdHex(year, month);
   
   // 画像をアップロード
-  const imagePath = path.join(__dirname, '..', 'metadata', 'images', `${tokenId}.png`);
+  const imagePath = path.join(__dirname, '..', 'metadata', 'images', `${tokenIdHex}.png`);
   if (!fs.existsSync(imagePath)) {
     throw new Error(`画像が見つかりません: ${imagePath}\n先に画像を生成してください: npm run images:generate ${year} ${month}`);
   }
   
-  const imageHash = await uploadFile(imagePath, `${tokenId}.png`);
+  const imageHash = await uploadFile(imagePath, `${tokenIdHex}.png`);
   
   // メタデータを読み込み、画像URLを更新
-  const metadataPath = path.join(__dirname, '..', 'metadata', `${tokenId}.json`);
+  const metadataPath = path.join(__dirname, '..', 'metadata', `${tokenIdHex}.json`);
   if (!fs.existsSync(metadataPath)) {
     throw new Error(`メタデータが見つかりません: ${metadataPath}\n先にメタデータを生成してください: npm run metadata:generate ${year} ${month}`);
   }
@@ -67,7 +72,7 @@ export async function uploadImageAndMetadata(
   metadata.image = imageHash; // IPFS URLに更新
   
   // メタデータをアップロード
-  const metadataHash = await uploadMetadata(metadata, `${tokenId}.json`);
+  const metadataHash = await uploadMetadata(metadata, `${tokenIdHex}.json`);
   
   return {
     imageHash,
@@ -77,64 +82,43 @@ export async function uploadImageAndMetadata(
 
 // メイン実行
 const args = process.argv.slice(2);
+const parsed = parseYearMonthArgs(args, { allowRange: true });
 
 (async () => {
   try {
-    if (args.length === 0) {
-      // デフォルト: 現在の月
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth() + 1;
-      
-      console.log(`\n📤 ${year}年${month}月のNFTをIPFSにアップロード中...\n`);
-      const result = await uploadImageAndMetadata(year, month);
-      
-      console.log('\n✅ アップロード完了！');
-      console.log(`画像: ${result.imageHash}`);
-      console.log(`メタデータ: ${result.metadataHash}`);
-    } else if (args.length === 2) {
-      // 単一月: year month
-      const year = parseInt(args[0]);
-      const month = parseInt(args[1]);
-      
-      console.log(`\n📤 ${year}年${month}月のNFTをIPFSにアップロード中...\n`);
-      const result = await uploadImageAndMetadata(year, month);
-      
-      console.log('\n✅ アップロード完了！');
-      console.log(`画像: ${result.imageHash}`);
-      console.log(`メタデータ: ${result.metadataHash}`);
-    } else if (args.length === 4) {
-      // 範囲: startYear startMonth endYear endMonth
-      const [startYear, startMonth, endYear, endMonth] = args.map(Number);
-      let year = startYear;
-      let month = startMonth;
-      
-      console.log(`\n📤 ${startYear}年${startMonth}月〜${endYear}年${endMonth}月のNFTをIPFSにアップロード中...\n`);
-      
-      while (year < endYear || (year === endYear && month <= endMonth)) {
-        console.log(`\n📅 ${year}年${month}月:`);
-        const result = await uploadImageAndMetadata(year, month);
-        console.log(`  ✅ 完了 - 画像: ${result.imageHash}`);
-        console.log(`  ✅ 完了 - メタデータ: ${result.metadataHash}`);
-        
-        month++;
-        if (month > 12) {
-          month = 1;
-          year++;
-        }
-      }
-      
-      console.log('\n✅ すべてのアップロードが完了しました！');
-    } else {
+    if (!parsed) {
       console.log('Usage:');
       console.log('  npx ts-node scripts/upload-to-pinata.ts                    # Current month');
       console.log('  npx ts-node scripts/upload-to-pinata.ts 2025 1             # Single month');
       console.log('  npx ts-node scripts/upload-to-pinata.ts 2025 1 2025 12     # Range');
+      return;
     }
+
+    if (parsed.kind === 'range') {
+      console.log(`\n📤 ${parsed.startYear}年${parsed.startMonth}月〜${parsed.endYear}年${parsed.endMonth}月のNFTをIPFSにアップロード中...\n`);
+      for (const { year, month } of iterateMonthRange(
+        parsed.startYear,
+        parsed.startMonth,
+        parsed.endYear,
+        parsed.endMonth
+      )) {
+        console.log(`\n📅 ${year}年${month}月:`);
+        const result = await uploadImageAndMetadata(year, month);
+        console.log(`  ✅ 完了 - 画像: ${result.imageHash}`);
+        console.log(`  ✅ 完了 - メタデータ: ${result.metadataHash}`);
+      }
+      console.log('\n✅ すべてのアップロードが完了しました！');
+      return;
+    }
+
+    console.log(`\n📤 ${parsed.year}年${parsed.month}月のNFTをIPFSにアップロード中...\n`);
+    const result = await uploadImageAndMetadata(parsed.year, parsed.month);
+
+    console.log('\n✅ アップロード完了！');
+    console.log(`画像: ${result.imageHash}`);
+    console.log(`メタデータ: ${result.metadataHash}`);
   } catch (error: any) {
     console.error('\n❌ Pinataアップロードエラー:', error.message || error);
     process.exit(1);
   }
 })();
-
-

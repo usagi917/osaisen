@@ -1,4 +1,4 @@
-import { PinataSDK } from '@pinata/sdk';
+import PinataClient from '@pinata/sdk';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as dotenv from 'dotenv';
@@ -11,9 +11,8 @@ if (!pinataJwt) {
   throw new Error('PINATA_JWT環境変数が設定されていません。.envファイルにPINATA_JWTを設定してください。');
 }
 
-const pinata = new PinataSDK({
-  pinataJwt: pinataJwt,
-  pinataGateway: 'gateway.pinata.cloud',
+const pinata = new PinataClient({
+  pinataJWTKey: pinataJwt,
 });
 
 /**
@@ -67,7 +66,14 @@ async function uploadMetadataDirectory(): Promise<string> {
   });
 
   // ディレクトリ全体をアップロード
-  const result = await pinata.upload.directory(tempDir);
+  const result = await pinata.pinFromFS(tempDir, {
+    pinataMetadata: {
+      name: 'osaisen-metadata',
+    },
+    pinataOptions: {
+      wrapWithDirectory: true,
+    },
+  });
 
   // 一時ディレクトリを削除
   fs.rmSync(tempDir, { recursive: true });
@@ -100,4 +106,3 @@ async function uploadMetadataDirectory(): Promise<string> {
     process.exit(1);
   }
 })();
-

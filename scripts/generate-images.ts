@@ -2,6 +2,12 @@ import * as fs from 'fs';
 import * as path from 'path';
 import sharp from 'sharp';
 import * as dotenv from 'dotenv';
+import {
+  MONTH_NAMES_JP,
+  getTokenIdHex,
+  iterateMonthRange,
+  parseYearMonthArgs,
+} from './lib/nftDate';
 
 dotenv.config();
 
@@ -9,18 +15,12 @@ dotenv.config();
 const BASE_IMAGE_PATH = path.join(__dirname, '..', 'assets', 'base-goshuin.png');
 const OUTPUT_DIR = path.join(__dirname, '..', 'metadata', 'images');
 
-// 日本語の月名
-const MONTH_NAMES_JP = [
-  '', '1月', '2月', '3月', '4月', '5月', '6月',
-  '7月', '8月', '9月', '10月', '11月', '12月'
-];
-
 async function generateImage(year: number, month: number): Promise<string> {
-  const tokenId = year * 100 + month;
+  const tokenIdHex = getTokenIdHex(year, month);
   const monthName = MONTH_NAMES_JP[month];
   
   // 出力パス
-  const outputPath = path.join(OUTPUT_DIR, `${tokenId}.png`);
+  const outputPath = path.join(OUTPUT_DIR, `${tokenIdHex}.png`);
   
   // 出力ディレクトリが存在しない場合は作成
   if (!fs.existsSync(OUTPUT_DIR)) {
@@ -71,58 +71,35 @@ async function generateImage(year: number, month: number): Promise<string> {
   return outputPath;
 }
 
-function generateMonthRange(
-  startYear: number, 
-  startMonth: number, 
-  endYear: number, 
-  endMonth: number
-): Promise<string[]> {
-  const promises: Promise<string>[] = [];
-  let year = startYear;
-  let month = startMonth;
-  
-  while (year < endYear || (year === endYear && month <= endMonth)) {
-    promises.push(generateImage(year, month));
-    
-    month++;
-    if (month > 12) {
-      month = 1;
-      year++;
-    }
-  }
-  
-  return Promise.all(promises);
-}
-
 // メイン実行
 const args = process.argv.slice(2);
+const parsed = parseYearMonthArgs(args, { allowRange: true });
 
 (async () => {
   try {
-    if (args.length === 0) {
-      // デフォルト: 現在の月
-      const now = new Date();
-      await generateImage(now.getFullYear(), now.getMonth() + 1);
-    } else if (args.length === 2) {
-      // 単一月: year month
-      const year = parseInt(args[0]);
-      const month = parseInt(args[1]);
-      await generateImage(year, month);
-    } else if (args.length === 4) {
-      // 範囲: startYear startMonth endYear endMonth
-      const [startYear, startMonth, endYear, endMonth] = args.map(Number);
-      await generateMonthRange(startYear, startMonth, endYear, endMonth);
-      console.log('\n✅ すべての画像生成が完了しました！');
-    } else {
+    if (!parsed) {
       console.log('Usage:');
       console.log('  npx ts-node scripts/generate-images.ts                    # Current month');
       console.log('  npx ts-node scripts/generate-images.ts 2025 1             # Single month');
       console.log('  npx ts-node scripts/generate-images.ts 2025 1 2025 12     # Range');
+      return;
     }
+
+    if (parsed.kind === 'range') {
+      const tasks = Array.from(iterateMonthRange(
+        parsed.startYear,
+        parsed.startMonth,
+        parsed.endYear,
+        parsed.endMonth
+      )).map(({ year, month }) => generateImage(year, month));
+      await Promise.all(tasks);
+      console.log('\n✅ すべての画像生成が完了しました！');
+      return;
+    }
+
+    await generateImage(parsed.year, parsed.month);
   } catch (error) {
     console.error('❌ 画像生成エラー:', error);
     process.exit(1);
   }
 })();
-
-
