@@ -22,7 +22,7 @@ export function StatusDisplay({
         <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
           isEligible 
             ? 'bg-md-tertiary-container text-md-on-tertiary-container' 
-            : 'bg-md-secondary-container text-md-on-secondary-container'
+            : 'bg-[#007AFF] text-white'
         }`}>
           {isEligible ? <Gift size={24} /> : <CheckCircle size={24} />}
         </div>

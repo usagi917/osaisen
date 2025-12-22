@@ -51,7 +51,7 @@ export function ResultModal({
             className="absolute inset-0 bg-md-surface-container-lowest/80 backdrop-blur-md"
             onClick={onClose}
           />
-          
+
           <motion.div
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -60,7 +60,7 @@ export function ResultModal({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close Button (Icon Button) */}
-            <button 
+            <button
               onClick={onClose}
               className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-md-on-surface-variant hover:bg-md-on-surface/10 transition-colors z-20"
             >
@@ -72,7 +72,7 @@ export function ResultModal({
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", bounce: 0.5, duration: 0.8 }}
-                className="w-20 h-20 bg-md-blue-container rounded-full flex items-center justify-center mb-6 text-md-on-blue-container shadow-lg"
+                className="w-20 h-20 bg-[#007AFF] rounded-full flex items-center justify-center mb-6 text-white shadow-lg"
               >
                 <Check size={40} className="stroke-[3]" />
               </motion.div>
@@ -104,7 +104,7 @@ export function ResultModal({
                     </p>
                   </div>
                   {/* Stamp Effect */}
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, scale: 2, rotate: 10 }}
                     animate={{ opacity: 0.2, scale: 1, rotate: -10 }}
                     className="absolute right-0 bottom-0 text-md-on-tertiary-container border-4 border-current rounded-lg p-2 font-black text-4xl rotate-[-15deg] pointer-events-none"
