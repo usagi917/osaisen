@@ -1,4 +1,4 @@
-import { useConnect, useAccount, useDisconnect } from 'wagmi';
+import { useConnect, useAccount, useDisconnect, type Connector } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Wallet, LogOut, ChevronRight, X } from 'lucide-react';
 import { useState, useMemo } from 'react';
@@ -17,7 +17,7 @@ export function WalletConnect() {
     ? `${address.slice(0, 4)}...${address.slice(-4)}`
     : '';
 
-  const handleConnect = async (connector: any, closeImmediately = false) => {
+  const handleConnect = async (connector: Connector, closeImmediately = false) => {
     // WalletConnectの場合は先にポップアップを閉じてQRモーダルを見えるようにする
     if (closeImmediately) {
       setShowConnectors(false);

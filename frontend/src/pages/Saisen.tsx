@@ -36,7 +36,7 @@ export function SaisenPage() {
       return;
     }
 
-    if (!autoSwitchAttemptedRef.current && chainId != null) {
+    if (!autoSwitchAttemptedRef.current && chainId !== undefined) {
       switchChain({ chainId: amoyChainId });
       autoSwitchAttemptedRef.current = true;
     }
