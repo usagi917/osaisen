@@ -28,7 +28,7 @@ const normalizeIpfsUrl = (uri?: string): string | null => {
   if (!uri.startsWith('ipfs://')) return uri;
   const gateway = (import.meta.env.VITE_IPFS_GATEWAY || 'https://ipfs.io/ipfs/')
     .trim()
-    .replace(/\/$/, '/');
+    .replace(/\/?$/, '/');
   const path = uri.replace('ipfs://', '');
   const normalizedPath = path.startsWith('ipfs/') ? path.slice(5) : path;
   return `${gateway}${normalizedPath}`;
@@ -68,7 +68,7 @@ export function MyPage() {
       return;
     }
 
-    if (!autoSwitchAttemptedRef.current && chainId != null) {
+    if (!autoSwitchAttemptedRef.current && chainId !== undefined) {
       switchChain({ chainId: amoyChainId });
       autoSwitchAttemptedRef.current = true;
     }

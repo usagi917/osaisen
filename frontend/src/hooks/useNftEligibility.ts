@@ -60,7 +60,7 @@ export function useNftEligibility({ userAddress, chainId }: UseNftEligibilityPro
   };
 
   return {
-    isEligible: isEligible ?? true, // Default to true if unknown
+    isEligible: isEligible ?? false, // Default to false while loading
     currentMonthId,
     lastMintMonthId,
     nftBalance: nftBalance ?? 0n,
