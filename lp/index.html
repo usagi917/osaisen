@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Osaisen - デジタルお賽銭</title>
+  <meta name="description" content="ブロックチェーンで奉納する新しい参拝のカタチ。JPYCで115円からお賽銭、毎月の御朱印NFTを授与。">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS v4 via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <style type="text/tailwindcss">
+    @theme {
+      --font-mincho: 'Shippori Mincho', serif;
+      --font-gothic: 'Zen Kaku Gothic New', sans-serif;
+
+      --color-shrine-black: #1a1a1a;
+      --color-shrine-charcoal: #2d2d2d;
+      --color-shrine-gray: #6b6b6b;
+      --color-shrine-silver: #a8a8a8;
+      --color-shrine-white: #fafaf8;
+      --color-shrine-cream: #f5f4f0;
+
+      --color-vermillion: #c53d43;
+      --color-vermillion-dark: #a33238;
+      --color-gold: #c9a86c;
+      --color-gold-light: #e8d5a3;
+
+      --color-jpyc-blue: #007AFF;
+      --color-polygon-purple: #8247e5;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes stamp {
+      0% { transform: scale(2) rotate(15deg); opacity: 0; }
+      60% { transform: scale(1) rotate(-12deg); opacity: 1; }
+      100% { transform: scale(1) rotate(-12deg); opacity: 1; }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-float { animation: float 4s ease-in-out infinite; }
+    .animate-shimmer {
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      background-size: 200% 100%;
+      animation: shimmer 2s infinite;
+    }
+    .animate-stamp { animation: stamp 0.6s ease-out forwards; }
+    .animate-fade-up { animation: fadeUp 0.8s ease-out forwards; }
+
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+    .delay-500 { animation-delay: 0.5s; }
+  </style>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Zen Kaku Gothic New', sans-serif;
+      background: #1a1a1a;
+      color: #fafaf8;
+    }
+
+    .font-mincho { font-family: 'Shippori Mincho', serif; }
+
+    /* Texture overlay */
+    .texture-overlay {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      opacity: 0.03;
+      pointer-events: none;
+    }
+
+    /* Washi paper texture for cards */
+    .washi-texture {
+      background:
+        radial-gradient(ellipse at 20% 30%, rgba(201, 168, 108, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 70%, rgba(197, 61, 67, 0.03) 0%, transparent 50%),
+        linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+    }
+
+    /* Phone mockup glow */
+    .phone-glow {
+      box-shadow:
+        0 0 60px rgba(201, 168, 108, 0.15),
+        0 0 120px rgba(197, 61, 67, 0.1),
+        0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Vermillion stamp effect */
+    .stamp-seal {
+      color: #c53d43;
+      border: 3px solid currentColor;
+      font-weight: 700;
+      transform: rotate(-12deg);
+    }
+  </style>
+</head>
+
+<body class="bg-shrine-black text-shrine-white antialiased overflow-x-hidden">
+  <!-- Texture Overlay -->
+  <div class="texture-overlay fixed inset-0 z-50 pointer-events-none"></div>
+
+  <!-- Header -->
+  <header class="fixed top-0 left-0 right-0 z-40 bg-shrine-black/80 backdrop-blur-md border-b border-shrine-charcoal/50">
+    <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-vermillion to-vermillion-dark flex items-center justify-center">
+          <span class="text-white text-sm font-bold">賽</span>
+        </div>
+        <span class="font-mincho text-lg tracking-wider">Osaisen</span>
+      </a>
+      <nav class="hidden md:flex items-center gap-8 text-sm text-shrine-silver">
+        <a href="#features" class="hover:text-shrine-white transition-colors">機能</a>
+        <a href="#how-it-works" class="hover:text-shrine-white transition-colors">使い方</a>
+        <a href="#for-shrines" class="hover:text-shrine-white transition-colors">神社・寺院向け</a>
+      </nav>
+      <a href="#demo" class="h-9 px-5 rounded-full bg-vermillion text-white text-sm font-medium flex items-center gap-2 hover:bg-vermillion-dark transition-colors">
+        デモを見る
+      </a>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="min-h-screen pt-16 flex flex-col justify-center relative">
+    <!-- Background gradient -->
+    <div class="absolute inset-0 bg-gradient-to-b from-shrine-black via-shrine-charcoal/20 to-shrine-black"></div>
+
+    <!-- Decorative elements -->
+    <div class="absolute top-1/4 left-10 w-px h-32 bg-gradient-to-b from-transparent via-gold/30 to-transparent"></div>
+    <div class="absolute top-1/3 right-10 w-px h-48 bg-gradient-to-b from-transparent via-vermillion/20 to-transparent"></div>
+
+    <div class="relative z-10 max-w-6xl mx-auto px-6 py-20">
+      <div class="grid lg:grid-cols-2 gap-12 items-center">
+        <!-- Left: Copy -->
+        <div class="text-center lg:text-left">
+          <p class="text-gold text-sm tracking-[0.3em] uppercase mb-4 animate-fade-up opacity-0" style="animation-delay: 0.1s">Digital Osaisen</p>
+
+          <h1 class="font-mincho text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6 animate-fade-up opacity-0" style="animation-delay: 0.2s">
+            ブロックチェーンで<br>
+            <span class="text-vermillion">奉納する</span><br>
+            新しい参拝のカタチ
+          </h1>
+
+          <p class="text-shrine-silver text-lg md:text-xl leading-relaxed mb-8 animate-fade-up opacity-0" style="animation-delay: 0.3s">
+            JPYCで115円からお賽銭。<br>
+            毎月の参拝記念に、御朱印NFTを授与します。
+          </p>
+
+          <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start animate-fade-up opacity-0" style="animation-delay: 0.4s">
+            <a href="#demo" class="h-14 px-8 rounded-full bg-vermillion text-white font-medium flex items-center justify-center gap-2 hover:bg-vermillion-dark transition-all hover:shadow-lg hover:shadow-vermillion/20">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              デモを見る
+            </a>
+            <a href="#how-it-works" class="h-14 px-8 rounded-full border border-shrine-gray text-shrine-white font-medium flex items-center justify-center hover:bg-shrine-charcoal transition-colors">
+              仕組みを見る
+            </a>
+          </div>
+
+          <div class="flex items-center gap-6 mt-8 justify-center lg:justify-start text-xs text-shrine-silver animate-fade-up opacity-0" style="animation-delay: 0.5s">
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              ガスレス取引
+            </span>
+            <span class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              日本円相当で奉納
+            </span>
+          </div>
+        </div>
+
+        <!-- Right: Phone Mockup with Actual UI -->
+        <div class="flex justify-center animate-float">
+          <div class="relative">
+            <!-- Phone Frame -->
+            <div class="w-[280px] md:w-[320px] bg-shrine-charcoal rounded-[3rem] p-3 phone-glow">
+              <div class="bg-shrine-black rounded-[2.5rem] overflow-hidden">
+                <!-- Status Bar -->
+                <div class="h-12 bg-shrine-black flex items-center justify-center">
+                  <div class="w-24 h-6 bg-shrine-charcoal rounded-full"></div>
+                </div>
+
+                <!-- App Content - Saisen Page UI Mockup -->
+                <div class="px-4 pb-6 bg-gradient-to-b from-shrine-black to-shrine-charcoal min-h-[500px]">
+                  <!-- App Header -->
+                  <div class="flex items-center justify-between py-3">
+                    <div class="flex items-center gap-2">
+                      <div class="w-6 h-6 rounded-full bg-gradient-to-br from-vermillion to-vermillion-dark flex items-center justify-center">
+                        <span class="text-white text-[8px] font-bold">賽</span>
+                      </div>
+                      <span class="font-mincho text-xs">Osaisen</span>
+                    </div>
+                    <div class="h-6 px-3 rounded-full bg-jpyc-blue/20 text-jpyc-blue text-[10px] flex items-center gap-1">
+                      <div class="w-1.5 h-1.5 rounded-full bg-jpyc-blue animate-pulse"></div>
+                      0x1a...4f2d
+                    </div>
+                  </div>
+
+                  <!-- NFT Status Card -->
+                  <div class="mt-4 p-3 rounded-2xl border border-gold/20 bg-shrine-charcoal/50">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full bg-gold/20 flex items-center justify-center">
+                        <svg class="w-5 h-5 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p class="text-[9px] text-shrine-silver uppercase tracking-wider">2026年2月 Monthly NFT</p>
+                        <p class="text-xs font-medium text-shrine-white">今月の御朱印を受け取る</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Balance Display -->
+                  <div class="mt-6 flex justify-center">
+                    <div class="flex items-center gap-2 text-shrine-silver text-[10px] bg-shrine-charcoal px-3 py-1 rounded-full">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Balance: 5,000 JPYC
+                    </div>
+                  </div>
+
+                  <!-- Amount Input -->
+                  <div class="mt-4 text-center">
+                    <div class="relative">
+                      <span class="text-5xl font-light text-shrine-white">500</span>
+                      <span class="text-xl text-shrine-silver ml-2">JPYC</span>
+                    </div>
+                  </div>
+
+                  <!-- Preset Chips -->
+                  <div class="mt-4 flex justify-center gap-2">
+                    <button class="h-7 px-3 rounded-lg text-[10px] border border-shrine-gray text-shrine-silver">¥115</button>
+                    <button class="h-7 px-3 rounded-lg text-[10px] bg-gold/20 text-gold border border-transparent">✓ ¥500</button>
+                    <button class="h-7 px-3 rounded-lg text-[10px] border border-shrine-gray text-shrine-silver">¥1,000</button>
+                    <button class="h-7 px-3 rounded-lg text-[10px] border border-shrine-gray text-shrine-silver">¥5,000</button>
+                  </div>
+
+                  <!-- Saisen Button -->
+                  <div class="mt-6">
+                    <button class="w-full h-12 rounded-full bg-jpyc-blue text-white text-sm font-medium flex items-center justify-center gap-2 shadow-lg shadow-jpyc-blue/30">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                      </svg>
+                      奉納する
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Floating NFT Card -->
+            <div class="absolute -right-8 top-20 w-32 bg-shrine-charcoal rounded-xl p-2 shadow-xl border border-gold/20 transform rotate-6">
+              <div class="aspect-[3/4] rounded-lg bg-gradient-to-br from-vermillion/20 to-gold/20 flex flex-col items-center justify-center">
+                <span class="text-3xl">⛩️</span>
+                <p class="text-[8px] text-shrine-silver mt-1">2026年2月</p>
+                <p class="text-[10px] font-mincho font-bold text-gold">御朱印</p>
+                <div class="stamp-seal text-[8px] px-1 mt-1 rounded">済</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Logos Bar -->
+  <section class="py-12 border-y border-shrine-charcoal/50 bg-shrine-charcoal/20">
+    <div class="max-w-6xl mx-auto px-6">
+      <p class="text-center text-xs text-shrine-gray mb-6 tracking-wider uppercase">Powered by</p>
+      <div class="flex items-center justify-center gap-12 flex-wrap">
+        <div class="flex items-center gap-2 text-shrine-silver opacity-60">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L1.5 6v12L12 24l10.5-6V6L12 0zm0 2.25l8.25 4.5v9l-8.25 4.5-8.25-4.5v-9l8.25-4.5z"/>
+          </svg>
+          <span class="text-sm font-medium">Polygon</span>
+        </div>
+        <div class="flex items-center gap-2 text-shrine-silver opacity-60">
+          <span class="text-sm font-bold text-jpyc-blue">JPYC</span>
+        </div>
+        <div class="flex items-center gap-2 text-shrine-silver opacity-60">
+          <span class="text-sm font-medium">ERC-1155</span>
+        </div>
+        <div class="flex items-center gap-2 text-shrine-silver opacity-60">
+          <span class="text-sm font-medium">WalletConnect</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section id="features" class="py-24 relative">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <p class="text-gold text-sm tracking-[0.2em] uppercase mb-4">Features</p>
+        <h2 class="font-mincho text-3xl md:text-4xl font-bold">Osaisenの特徴</h2>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8">
+        <!-- Feature 1: Monthly NFT -->
+        <div class="washi-texture rounded-3xl p-8 border border-shrine-charcoal hover:border-gold/30 transition-colors group">
+          <div class="flex items-start gap-6">
+            <div class="w-16 h-16 rounded-2xl bg-gold/10 flex items-center justify-center shrink-0 group-hover:bg-gold/20 transition-colors">
+              <svg class="w-8 h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-mincho text-xl font-bold mb-3">毎月の御朱印NFT</h3>
+              <p class="text-shrine-silver leading-relaxed">
+                月に一度の参拝で、その月限定の御朱印NFTを自動で授与。デジタル御朱印帳として参拝履歴がブロックチェーンに永続的に記録されます。
+              </p>
+
+              <!-- Mini NFT Gallery Mockup -->
+              <div class="mt-6 flex gap-2">
+                <div class="w-16 h-20 rounded-lg bg-shrine-charcoal border border-gold/20 flex flex-col items-center justify-center">
+                  <span class="text-lg">⛩️</span>
+                  <p class="text-[7px] text-shrine-silver">2026/01</p>
+                  <div class="stamp-seal text-[6px] px-0.5 rounded scale-75">済</div>
+                </div>
+                <div class="w-16 h-20 rounded-lg bg-shrine-charcoal border border-gold/20 flex flex-col items-center justify-center">
+                  <span class="text-lg">🏯</span>
+                  <p class="text-[7px] text-shrine-silver">2025/12</p>
+                  <div class="stamp-seal text-[6px] px-0.5 rounded scale-75">済</div>
+                </div>
+                <div class="w-16 h-20 rounded-lg bg-shrine-charcoal border border-gold/20 flex flex-col items-center justify-center">
+                  <span class="text-lg">🍁</span>
+                  <p class="text-[7px] text-shrine-silver">2025/11</p>
+                  <div class="stamp-seal text-[6px] px-0.5 rounded scale-75">済</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 2: JPYC -->
+        <div class="washi-texture rounded-3xl p-8 border border-shrine-charcoal hover:border-jpyc-blue/30 transition-colors group">
+          <div class="flex items-start gap-6">
+            <div class="w-16 h-16 rounded-2xl bg-jpyc-blue/10 flex items-center justify-center shrink-0 group-hover:bg-jpyc-blue/20 transition-colors">
+              <span class="text-2xl font-bold text-jpyc-blue">¥</span>
+            </div>
+            <div>
+              <h3 class="font-mincho text-xl font-bold mb-3">JPYC（日本円ステーブルコイン）</h3>
+              <p class="text-shrine-silver leading-relaxed">
+                1 JPYC = 1円相当のステーブルコイン。暗号通貨の価格変動を気にせず、日本円感覚でお賽銭ができます。115円（115 JPYC）から奉納可能。
+              </p>
+
+              <!-- JPYC Amount Visualization -->
+              <div class="mt-6 flex items-center gap-4 text-sm">
+                <div class="flex items-baseline gap-1">
+                  <span class="text-2xl font-light text-jpyc-blue">115</span>
+                  <span class="text-shrine-silver">JPYC</span>
+                </div>
+                <span class="text-shrine-gray">=</span>
+                <div class="flex items-baseline gap-1">
+                  <span class="text-2xl font-light text-shrine-white">¥115</span>
+                  <span class="text-shrine-silver">相当</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 3: Gasless -->
+        <div class="washi-texture rounded-3xl p-8 border border-shrine-charcoal hover:border-polygon-purple/30 transition-colors group">
+          <div class="flex items-start gap-6">
+            <div class="w-16 h-16 rounded-2xl bg-polygon-purple/10 flex items-center justify-center shrink-0 group-hover:bg-polygon-purple/20 transition-colors">
+              <svg class="w-8 h-8 text-polygon-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-mincho text-xl font-bold mb-3">ガスレス取引</h3>
+              <p class="text-shrine-silver leading-relaxed">
+                Account Abstraction対応で、ガス代（手数料）を気にせずスムーズにお賽銭。奉納金額だけを支払えばOK。複雑な操作は不要です。
+              </p>
+
+              <!-- Transaction Flow -->
+              <div class="mt-6 flex items-center gap-2 text-xs">
+                <div class="px-3 py-2 rounded-lg bg-shrine-charcoal text-shrine-silver">奉納金額のみ</div>
+                <svg class="w-4 h-4 text-shrine-gray" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+                <div class="px-3 py-2 rounded-lg bg-polygon-purple/20 text-polygon-purple">ガス代0円</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 4: Security -->
+        <div class="washi-texture rounded-3xl p-8 border border-shrine-charcoal hover:border-vermillion/30 transition-colors group">
+          <div class="flex items-start gap-6">
+            <div class="w-16 h-16 rounded-2xl bg-vermillion/10 flex items-center justify-center shrink-0 group-hover:bg-vermillion/20 transition-colors">
+              <svg class="w-8 h-8 text-vermillion" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-mincho text-xl font-bold mb-3">安全なスマートコントラクト</h3>
+              <p class="text-shrine-silver leading-relaxed">
+                OpenZeppelinのセキュリティ標準に準拠。ReentrancyGuardとAccessControlで安全性を担保。奉納金は直接神社のウォレットへ送金されます。
+              </p>
+
+              <!-- Security Badges -->
+              <div class="mt-6 flex flex-wrap gap-2">
+                <span class="px-2 py-1 rounded text-[10px] bg-shrine-charcoal text-shrine-silver">OpenZeppelin</span>
+                <span class="px-2 py-1 rounded text-[10px] bg-shrine-charcoal text-shrine-silver">ReentrancyGuard</span>
+                <span class="px-2 py-1 rounded text-[10px] bg-shrine-charcoal text-shrine-silver">AccessControl</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section id="how-it-works" class="py-24 bg-shrine-charcoal/20 relative">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <p class="text-gold text-sm tracking-[0.2em] uppercase mb-4">How It Works</p>
+        <h2 class="font-mincho text-3xl md:text-4xl font-bold">お賽銭の流れ</h2>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Step 1 -->
+        <div class="text-center">
+          <div class="relative inline-block mb-6">
+            <div class="w-20 h-20 rounded-full bg-shrine-charcoal border-2 border-gold/30 flex items-center justify-center mx-auto">
+              <svg class="w-8 h-8 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+              </svg>
+            </div>
+            <span class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-gold text-shrine-black text-sm font-bold flex items-center justify-center">1</span>
+          </div>
+          <h3 class="font-mincho text-lg font-bold mb-3">ウォレットを接続</h3>
+          <p class="text-shrine-silver text-sm leading-relaxed">
+            HashPort WalletやMetaMaskなど、お使いのウォレットを接続します。WalletConnectにも対応。
+          </p>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="text-center">
+          <div class="relative inline-block mb-6">
+            <div class="w-20 h-20 rounded-full bg-shrine-charcoal border-2 border-vermillion/30 flex items-center justify-center mx-auto">
+              <span class="text-3xl">💴</span>
+            </div>
+            <span class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-vermillion text-white text-sm font-bold flex items-center justify-center">2</span>
+          </div>
+          <h3 class="font-mincho text-lg font-bold mb-3">金額を選んで奉納</h3>
+          <p class="text-shrine-silver text-sm leading-relaxed">
+            115円〜お好みの金額を選択。JPYCで簡単にお賽銭を奉納できます。
+          </p>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="text-center">
+          <div class="relative inline-block mb-6">
+            <div class="w-20 h-20 rounded-full bg-shrine-charcoal border-2 border-jpyc-blue/30 flex items-center justify-center mx-auto">
+              <svg class="w-8 h-8 text-jpyc-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+              </svg>
+            </div>
+            <span class="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-jpyc-blue text-white text-sm font-bold flex items-center justify-center">3</span>
+          </div>
+          <h3 class="font-mincho text-lg font-bold mb-3">御朱印NFTを受け取る</h3>
+          <p class="text-shrine-silver text-sm leading-relaxed">
+            月の初回奉納時に、その月の限定御朱印NFTが自動で授与されます。
+          </p>
+        </div>
+      </div>
+
+      <!-- Result Modal Mockup -->
+      <div id="demo" class="mt-20 max-w-sm mx-auto">
+        <p class="text-center text-shrine-gray text-sm mb-6">奉納完了画面</p>
+        <div class="bg-shrine-charcoal rounded-[2rem] p-6 border border-gold/20 shadow-2xl">
+          <div class="flex flex-col items-center">
+            <!-- Check Icon -->
+            <div class="w-16 h-16 rounded-full bg-jpyc-blue flex items-center justify-center mb-4">
+              <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <h3 class="font-mincho text-xl font-bold mb-1">奉納完了</h3>
+            <p class="text-shrine-silver text-xs mb-6">Thank you for your donation</p>
+
+            <div class="text-center mb-6">
+              <span class="text-4xl font-light text-shrine-white">500</span>
+              <span class="text-lg text-shrine-silver ml-2">JPYC</span>
+            </div>
+
+            <!-- NFT Granted Card -->
+            <div class="w-full bg-gold/10 border border-gold/30 rounded-2xl p-4 flex items-center gap-4 relative overflow-hidden">
+              <div class="w-12 h-12 rounded-full bg-gold/20 flex items-center justify-center">
+                <svg class="w-6 h-6 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                </svg>
+              </div>
+              <div>
+                <p class="text-[10px] text-gold-light font-bold tracking-wider">NFT GRANTED</p>
+                <p class="text-gold font-bold">2026年2月 御朱印</p>
+              </div>
+              <!-- Stamp -->
+              <div class="absolute right-2 bottom-2 text-gold border-2 border-current rounded px-2 py-0.5 text-xl font-black transform -rotate-12 opacity-50">済</div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex gap-3 w-full mt-6">
+              <button class="flex-1 h-10 rounded-full border border-shrine-gray text-shrine-silver text-sm flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                詳細
+              </button>
+              <button class="flex-1 h-10 rounded-full bg-jpyc-blue text-white text-sm flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                </svg>
+                シェア
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- For Shrines Section -->
+  <section id="for-shrines" class="py-24 relative">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <p class="text-vermillion text-sm tracking-[0.2em] uppercase mb-4">For Shrines & Temples</p>
+          <h2 class="font-mincho text-3xl md:text-4xl font-bold mb-6">
+            神社・寺院の<br>新しい収入源
+          </h2>
+          <p class="text-shrine-silver text-lg leading-relaxed mb-8">
+            遠方の参拝者や、デジタルネイティブ世代とのつながりを維持。物理的な距離を超えて、信仰心を受け止める新しい形です。
+          </p>
+
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-gold mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <div>
+                <span class="text-shrine-white font-medium">24時間365日対応</span>
+                <p class="text-shrine-silver text-sm mt-1">時間や場所を問わず、いつでも奉納を受け付け</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-gold mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <div>
+                <span class="text-shrine-white font-medium">透明な収支管理</span>
+                <p class="text-shrine-silver text-sm mt-1">ブロックチェーンで全取引を記録、改ざん不可能な履歴</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <svg class="w-5 h-5 text-gold mt-0.5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+              </svg>
+              <div>
+                <span class="text-shrine-white font-medium">ブランディング効果</span>
+                <p class="text-shrine-silver text-sm mt-1">オリジナル御朱印NFTで独自の世界観を表現</p>
+              </div>
+            </li>
+          </ul>
+
+          <a href="mailto:contact@osaisen.example" class="inline-flex items-center gap-2 h-12 px-6 rounded-full border border-vermillion text-vermillion hover:bg-vermillion hover:text-white transition-colors font-medium">
+            導入のご相談
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </a>
+        </div>
+
+        <!-- Dashboard Mockup -->
+        <div class="bg-shrine-charcoal rounded-3xl p-6 border border-shrine-gray/20">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="font-medium">管理ダッシュボード</h3>
+            <span class="text-xs text-shrine-gray">プレビュー</span>
+          </div>
+
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <div class="bg-shrine-black/50 rounded-2xl p-4">
+              <p class="text-xs text-shrine-silver mb-1">今月の奉納額</p>
+              <p class="text-2xl font-light text-shrine-white">¥125,500</p>
+              <p class="text-xs text-green-400 mt-1">+12.3% 先月比</p>
+            </div>
+            <div class="bg-shrine-black/50 rounded-2xl p-4">
+              <p class="text-xs text-shrine-silver mb-1">参拝者数</p>
+              <p class="text-2xl font-light text-shrine-white">847</p>
+              <p class="text-xs text-green-400 mt-1">+5.7% 先月比</p>
+            </div>
+          </div>
+
+          <!-- Chart Placeholder -->
+          <div class="bg-shrine-black/50 rounded-2xl p-4 h-32 flex items-end justify-between gap-1">
+            <div class="w-full h-[30%] bg-gold/30 rounded-t"></div>
+            <div class="w-full h-[45%] bg-gold/30 rounded-t"></div>
+            <div class="w-full h-[35%] bg-gold/30 rounded-t"></div>
+            <div class="w-full h-[60%] bg-gold/30 rounded-t"></div>
+            <div class="w-full h-[75%] bg-gold/30 rounded-t"></div>
+            <div class="w-full h-[55%] bg-gold/30 rounded-t"></div>
+            <div class="w-full h-[80%] bg-gold rounded-t"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-shrine-gray mt-2 px-2">
+            <span>1月</span>
+            <span>2月</span>
+            <span>3月</span>
+            <span>4月</span>
+            <span>5月</span>
+            <span>6月</span>
+            <span>7月</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="py-24 relative overflow-hidden">
+    <!-- Background -->
+    <div class="absolute inset-0 bg-gradient-to-br from-vermillion/20 via-shrine-black to-gold/10"></div>
+    <div class="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23c9a86c\" fill-opacity=\"0.03\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
+
+    <div class="relative z-10 max-w-4xl mx-auto px-6 text-center">
+      <p class="text-gold text-sm tracking-[0.3em] uppercase mb-4">Get Started</p>
+      <h2 class="font-mincho text-3xl md:text-5xl font-bold mb-6">
+        デジタル参拝を<br>今すぐ体験
+      </h2>
+      <p class="text-shrine-silver text-lg mb-10 max-w-2xl mx-auto">
+        ウォレットを接続するだけで、新しい参拝のカタチを体験できます。<br>
+        毎月の御朱印NFTを集めて、デジタル御朱印帳を育てましょう。
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="#demo" class="h-14 px-10 rounded-full bg-vermillion text-white font-medium flex items-center justify-center gap-2 hover:bg-vermillion-dark transition-all hover:shadow-lg hover:shadow-vermillion/30 text-lg">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          デモを見る
+        </a>
+      </div>
+
+      <div class="flex items-center justify-center gap-6 mt-8 text-sm text-shrine-silver">
+        <span class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+          </svg>
+          115円から
+        </span>
+        <span class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+          </svg>
+          ガス代無料
+        </span>
+        <span class="flex items-center gap-2">
+          <svg class="w-4 h-4 text-gold" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+          </svg>
+          NFT自動授与
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 border-t border-shrine-charcoal">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-br from-vermillion to-vermillion-dark flex items-center justify-center">
+            <span class="text-white text-sm font-bold">賽</span>
+          </div>
+          <span class="font-mincho text-lg tracking-wider">Osaisen</span>
+        </div>
+
+        <div class="flex items-center gap-6 text-sm text-shrine-silver">
+          <a href="#" class="hover:text-shrine-white transition-colors">利用規約</a>
+          <a href="#" class="hover:text-shrine-white transition-colors">プライバシーポリシー</a>
+          <a href="#" class="hover:text-shrine-white transition-colors">お問い合わせ</a>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <a href="#" class="w-10 h-10 rounded-full bg-shrine-charcoal flex items-center justify-center text-shrine-silver hover:text-shrine-white hover:bg-shrine-gray/30 transition-colors">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-shrine-charcoal flex items-center justify-center text-shrine-silver hover:text-shrine-white hover:bg-shrine-gray/30 transition-colors">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C5.374 0 0 5.373 0 12c0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-8 pt-8 border-t border-shrine-charcoal/50 text-center text-xs text-shrine-gray">
+        <p>&copy; 2026 Osaisen. Built on Polygon with JPYC.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Smooth scroll for anchor links -->
+  <script>
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
