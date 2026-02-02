@@ -16,7 +16,8 @@ const parseBigInt = (value?: string): bigint | null => {
   if (!trimmed) return null;
   try {
     return BigInt(trimmed);
-  } catch {
+  } catch (error) {
+    console.warn(`[parseBigInt] Failed to parse value: "${trimmed}"`, error);
     return null;
   }
 };
@@ -110,7 +111,13 @@ export function useGoshuinHistory({ userAddress, chainId }: UseGoshuinHistoryPro
       setIsPartial(partial);
       setRangeInfo({ start: startBlock, end: latestBlock });
     } catch (err) {
-      setError(err as Error);
+      const normalizedError = err instanceof Error ? err : new Error(String(err));
+      console.error('[useGoshuinHistory] Failed to fetch offering history', {
+        chainId,
+        userAddress,
+        error: normalizedError,
+      });
+      setError(normalizedError);
     } finally {
       setIsLoading(false);
     }
