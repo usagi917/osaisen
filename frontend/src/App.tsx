@@ -7,7 +7,15 @@ import { AppHeader, type AppPage } from './components/AppHeader';
 import { MyPage } from './pages/MyPage';
 import { SaisenPage } from './pages/Saisen';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5分間キャッシュ有効
+      gcTime: 1000 * 60 * 30, // 30分間GC対象外
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const getPageFromHash = (): AppPage => {
   if (typeof window === 'undefined') return 'saisen';

@@ -80,27 +80,62 @@ export function useGoshuinHistory({ userAddress, chainId }: UseGoshuinHistoryPro
         return;
       }
 
-      const collected: bigint[] = [];
-      for (let fromBlock = startBlock; fromBlock <= latestBlock; fromBlock += chunkSize) {
+      // セッションキャッシュから取得
+      const cacheKey = `goshuin-${chainId}-${userAddress}`;
+      const cached = sessionStorage.getItem(cacheKey);
+      let cachedMonths: bigint[] = [];
+      let cachedEndBlock = startBlock;
+
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached) as { months: string[]; endBlock: string };
+          if (!Array.isArray(parsed.months) || typeof parsed.endBlock !== 'string') {
+            throw new Error('Invalid cache structure');
+          }
+          cachedMonths = parsed.months.map((m) => BigInt(m));
+          cachedEndBlock = BigInt(parsed.endBlock);
+        } catch (err) {
+          console.warn('[useGoshuinHistory] Cache corrupted, clearing', {
+            cacheKey,
+            error: err instanceof Error ? err.message : String(err),
+          });
+          sessionStorage.removeItem(cacheKey);
+        }
+      }
+
+      // キャッシュ済みブロック以降のみスキャン
+      const actualStartBlock = cachedEndBlock > startBlock ? cachedEndBlock + 1n : startBlock;
+
+      // チャンク分割を事前に作成
+      const chunks: { fromBlock: bigint; toBlock: bigint }[] = [];
+      for (let fromBlock = actualStartBlock; fromBlock <= latestBlock; fromBlock += chunkSize) {
         const toBlock = fromBlock + chunkSize - 1n > latestBlock
           ? latestBlock
           : fromBlock + chunkSize - 1n;
-
-        const logs = await publicClient.getContractEvents({
-          address: contracts.router,
-          abi: ROUTER_ABI,
-          eventName: 'Saisen',
-          args: { user: userAddress },
-          fromBlock,
-          toBlock,
-        });
-
-        logs.forEach((log) => {
-          if (log.args?.minted && typeof log.args?.monthId === 'bigint') {
-            collected.push(log.args.monthId);
-          }
-        });
+        chunks.push({ fromBlock, toBlock });
       }
+
+      // 並列でイベント取得
+      const results = await Promise.all(
+        chunks.map(({ fromBlock, toBlock }) =>
+          publicClient.getContractEvents({
+            address: contracts.router,
+            abi: ROUTER_ABI,
+            eventName: 'Saisen',
+            args: { user: userAddress },
+            fromBlock,
+            toBlock,
+          })
+        )
+      );
+
+      // 結果を集約
+      const collected: bigint[] = [...cachedMonths];
+      results.flat().forEach((log) => {
+        if (log.args?.minted && typeof log.args?.monthId === 'bigint') {
+          collected.push(log.args.monthId);
+        }
+      });
 
       const uniqueMonths = Array.from(new Set(collected.map((id) => id.toString()))).map(
         (value) => BigInt(value)
@@ -110,6 +145,23 @@ export function useGoshuinHistory({ userAddress, chainId }: UseGoshuinHistoryPro
       setMonths(uniqueMonths);
       setIsPartial(partial);
       setRangeInfo({ start: startBlock, end: latestBlock });
+
+      // セッションキャッシュに保存
+      try {
+        sessionStorage.setItem(
+          cacheKey,
+          JSON.stringify({
+            months: uniqueMonths.map((m) => m.toString()),
+            endBlock: latestBlock.toString(),
+          })
+        );
+      } catch (err) {
+        console.warn('[useGoshuinHistory] Failed to save cache', {
+          cacheKey,
+          error: err instanceof Error ? err.message : String(err),
+          isQuotaError: err instanceof DOMException && err.name === 'QuotaExceededError',
+        });
+      }
     } catch (err) {
       const normalizedError = err instanceof Error ? err : new Error(String(err));
       console.error('[useGoshuinHistory] Failed to fetch offering history', {

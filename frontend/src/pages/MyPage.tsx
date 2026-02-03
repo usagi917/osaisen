@@ -22,6 +22,46 @@ interface GoshuinMetadata {
   external_url?: string;
 }
 
+const METADATA_CACHE_PREFIX = 'nft-metadata-';
+
+const getMetadataFromCache = (monthId: string): GoshuinMetadata | null => {
+  const cacheKey = `${METADATA_CACHE_PREFIX}${monthId}`;
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) {
+      const parsed = JSON.parse(cached) as GoshuinMetadata;
+      if (typeof parsed === 'object' && parsed !== null) {
+        return parsed;
+      }
+      throw new Error('Invalid cache structure');
+    }
+  } catch (err) {
+    console.warn('[MyPage] Cache corrupted, clearing', {
+      cacheKey,
+      error: err instanceof Error ? err.message : String(err),
+    });
+    try {
+      localStorage.removeItem(cacheKey);
+    } catch {
+      // 削除失敗は無視
+    }
+  }
+  return null;
+};
+
+const setMetadataToCache = (monthId: string, metadata: GoshuinMetadata): void => {
+  const cacheKey = `${METADATA_CACHE_PREFIX}${monthId}`;
+  try {
+    localStorage.setItem(cacheKey, JSON.stringify(metadata));
+  } catch (err) {
+    console.warn('[MyPage] Failed to save cache', {
+      cacheKey,
+      error: err instanceof Error ? err.message : String(err),
+      isQuotaError: err instanceof DOMException && err.name === 'QuotaExceededError',
+    });
+  }
+};
+
 const normalizeIpfsUrl = (uri?: string): string | null => {
   if (!uri) return null;
   if (!uri.startsWith('ipfs://')) return uri;
@@ -114,8 +154,27 @@ export function MyPage() {
     });
   }, [metadataBaseUrl, months, uriData]);
 
-  const [metadataById, setMetadataById] = useState<Record<string, GoshuinMetadata>>({});
+  // localStorageからキャッシュを取得
+  const cachedMetadata = useMemo(() => {
+    const cached: Record<string, GoshuinMetadata> = {};
+    months.forEach((monthId) => {
+      const key = monthId.toString();
+      const fromCache = getMetadataFromCache(key);
+      if (fromCache) {
+        cached[key] = fromCache;
+      }
+    });
+    return cached;
+  }, [months]);
+
+  const [fetchedMetadata, setFetchedMetadata] = useState<Record<string, GoshuinMetadata>>({});
   const [isMetadataLoading, setIsMetadataLoading] = useState(false);
+
+  // キャッシュとfetch結果をマージ
+  const metadataById = useMemo(
+    () => ({ ...cachedMetadata, ...fetchedMetadata }),
+    [cachedMetadata, fetchedMetadata]
+  );
 
   const missingMonthIds = useMemo(
     () => months.filter((monthId) => !metadataById[monthId.toString()]),
@@ -152,12 +211,14 @@ export function MyPage() {
 
       if (cancelled) return;
 
-      setMetadataById((prev) => {
+      setFetchedMetadata((prev) => {
         const next = { ...prev };
         entries.forEach((entry) => {
           if (!entry) return;
           const [key, data] = entry;
           next[key] = data;
+          // localStorageにキャッシュ
+          setMetadataToCache(key, data);
         });
         return next;
       });
