@@ -10,22 +10,22 @@ Osaisen（デジタルお賽銭箱）は、Polygonネットワーク上でJPYC�
 
 ### スマートコントラクト（ルートディレクトリ）
 ```bash
-npm run compile          # コントラクトのコンパイル
-npm run test             # Hardhatテスト実行
-npm run typecheck        # TypeScript型チェック
-npm run node             # ローカルHardhatノード起動
-npm run dev:setup        # ローカルセットアップ（Mockトークンデプロイ等）
-npm run deploy:amoy      # Amoyテストネットへデプロイ
-npm run deploy:mainnet   # Polygonメインネットへデプロイ
+pnpm compile          # コントラクトのコンパイル
+pnpm test             # Hardhatテスト実行
+pnpm typecheck        # TypeScript型チェック
+pnpm node             # ローカルHardhatノード起動
+pnpm dev:setup        # ローカルセットアップ（Mockトークンデプロイ等）
+pnpm deploy:amoy      # Amoyテストネットへデプロイ
+pnpm deploy:mainnet   # Polygonメインネットへデプロイ
 ```
 
 ### フロントエンド（frontend/ディレクトリ）
 ```bash
-npm run dev              # 開発サーバー起動（http://localhost:5173）
-npm run build            # プロダクションビルド
-npm run lint             # ESLint実行
-npm run test:e2e         # Playwright E2Eテスト実行
-npm run test:e2e:headed  # ブラウザ表示付きE2Eテスト
+pnpm dev              # 開発サーバー起動（http://localhost:5173）
+pnpm build            # プロダクションビルド
+pnpm lint             # ESLint実行
+pnpm test:e2e         # Playwright E2Eテスト実行
+pnpm test:e2e:headed  # ブラウザ表示付きE2Eテスト
 ```
 
 ## アーキテクチャ

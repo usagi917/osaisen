@@ -1,5 +1,4 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, ExternalLink, Gift, Share2 } from 'lucide-react';
 
 interface ResultModalProps {
   isOpen: boolean;
@@ -22,12 +21,12 @@ export function ResultModal({
 }: ResultModalProps) {
   const getExplorerUrl = (hash: string) => {
     switch (chainId) {
-      case 80002: // Amoy
+      case 80002:
         return `https://amoy.polygonscan.com/tx/${hash}`;
-      case 137: // Polygon
+      case 137:
         return `https://polygonscan.com/tx/${hash}`;
       default:
-        return `https://polygonscan.com/tx/${hash}`; // Default fallback
+        return `https://polygonscan.com/tx/${hash}`;
     }
   };
 
@@ -44,94 +43,175 @@ export function ResultModal({
     <AnimatePresence>
       {isOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-md-surface-container-lowest/80 backdrop-blur-md"
+            className="absolute inset-0 bg-sumi/90 backdrop-blur-sm"
             onClick={onClose}
           />
 
+          {/* Modal */}
           <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            className="relative w-full max-w-sm bg-md-surface-container rounded-[2rem] p-6 shadow-2xl overflow-hidden border border-md-outline-variant/10"
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            className="relative w-full max-w-md bg-sumi border border-sumi-lighter p-8 overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close Button (Icon Button) */}
+            {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-md-on-surface-variant hover:bg-md-on-surface/10 transition-colors z-20"
+              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-washi/30 hover:text-washi transition-colors"
             >
-              <X size={24} />
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
             </button>
 
-            <div className="flex flex-col items-center relative z-10 pt-4">
+            {/* Content */}
+            <div className="flex flex-col items-center text-center pt-4">
+              {/* Success icon with ink spread animation */}
               <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ type: "spring", bounce: 0.5, duration: 0.8 }}
-                className="w-20 h-20 bg-[#007AFF] rounded-full flex items-center justify-center mb-6 text-white shadow-lg"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', bounce: 0.4, duration: 0.8, delay: 0.1 }}
+                className="relative mb-8"
               >
-                <Check size={40} className="stroke-[3]" />
+                <div className="w-20 h-20 border border-shu flex items-center justify-center text-shu">
+                  <motion.svg
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 0.6, delay: 0.3 }}
+                    width="32"
+                    height="32"
+                    viewBox="0 0 32 32"
+                    fill="none"
+                  >
+                    <motion.path
+                      d="M8 16L14 22L24 10"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.6, delay: 0.3 }}
+                    />
+                  </motion.svg>
+                </div>
+
+                {/* Ripple effect */}
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0.6 }}
+                  animate={{ scale: 2, opacity: 0 }}
+                  transition={{ duration: 1, delay: 0.2 }}
+                  className="absolute inset-0 border border-shu"
+                />
               </motion.div>
 
-              <h2 className="type-headline-medium text-md-on-surface mb-1">奉納完了</h2>
-              <p className="text-md-on-surface-variant text-sm mb-8">Thank you for your donation</p>
+              {/* Title */}
+              <motion.h2
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+                className="font-serif text-2xl text-washi mb-2"
+              >
+                奉納完了
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3 }}
+                className="font-mono text-[10px] tracking-[0.2em] uppercase text-washi/40 mb-8"
+              >
+                Offering Complete
+              </motion.p>
 
-              <div className="text-center mb-8">
-                <span className="type-display-large text-white font-medium">
+              {/* Amount */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4 }}
+                className="mb-8"
+              >
+                <p className="font-serif text-5xl text-washi mb-2">
                   {amount.toLocaleString()}
-                </span>
-                <span className="type-headline-medium text-md-on-surface-variant ml-2">JPYC</span>
-              </div>
+                </p>
+                <p className="font-mono text-xs tracking-[0.3em] uppercase text-washi/40">
+                  JPYC
+                </p>
+              </motion.div>
 
+              {/* NFT Minted notification */}
               {minted && (
                 <motion.div
-                  initial={{ scale: 1.2, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  className="w-full bg-md-tertiary-container text-md-on-tertiary-container rounded-2xl p-4 mb-6 flex items-center gap-4 relative overflow-hidden group"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="w-full border border-shu/30 bg-shu/5 p-6 mb-8 relative"
                 >
-                  <div className="p-3 bg-md-on-tertiary-container/10 rounded-full">
-                    <Gift size={24} />
+                  <div className="flex items-center gap-4">
+                    <div className="text-shu">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <rect x="3" y="8" width="18" height="13" rx="1" />
+                        <path d="M12 8V21" />
+                        <path d="M3 12H21" />
+                      </svg>
+                    </div>
+                    <div className="text-left">
+                      <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-shu mb-1">
+                        NFT Granted
+                      </p>
+                      <p className="font-serif text-base text-washi">
+                        {monthId && formatMonthId(monthId)} 御朱印
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-left">
-                    <p className="text-xs font-bold tracking-wider opacity-80">NFT GRANTED</p>
-                    <p className="font-bold text-lg">
-                      {monthId && formatMonthId(monthId)} 御朱印
-                    </p>
-                  </div>
-                  {/* Stamp Effect */}
+
+                  {/* Stamp effect */}
                   <motion.div
-                    initial={{ opacity: 0, scale: 2, rotate: 10 }}
-                    animate={{ opacity: 0.2, scale: 1, rotate: -10 }}
-                    className="absolute right-0 bottom-0 text-md-on-tertiary-container border-4 border-current rounded-lg p-2 font-black text-4xl rotate-[-15deg] pointer-events-none"
+                    initial={{ opacity: 0, scale: 1.5, rotate: 15 }}
+                    animate={{ opacity: 0.15, scale: 1, rotate: -12 }}
+                    transition={{ delay: 0.7, duration: 0.4 }}
+                    className="absolute right-4 bottom-4 font-serif text-4xl text-shu border-2 border-current px-2 py-1"
                   >
                     済
                   </motion.div>
                 </motion.div>
               )}
 
-              <div className="flex gap-3 w-full">
+              {/* Action buttons */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6 }}
+                className="flex gap-3 w-full"
+              >
                 {explorerUrl && (
                   <a
                     href={explorerUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 h-12 rounded-full border border-md-outline text-md-primary flex items-center justify-center gap-2 hover:bg-md-primary/10 transition-colors state-layer text-sm font-medium"
+                    className="flex-1 h-12 border border-sumi-lighter flex items-center justify-center gap-2 font-mono text-xs tracking-wider text-washi/60 hover:border-washi/30 hover:text-washi transition-all duration-300"
                   >
-                    <ExternalLink size={18} />
-                    詳細
+                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5">
+                      <path d="M6 1H2C1.5 1 1 1.5 1 2V12C1 12.5 1.5 13 2 13H12C12.5 13 13 12.5 13 12V8" />
+                      <path d="M9 1H13V5" />
+                      <path d="M13 1L6 8" />
+                    </svg>
+                    Explorer
                   </a>
                 )}
-                {/* Share Button (Filled Button) */}
-                <button className="flex-1 h-12 rounded-full bg-md-blue-container text-md-on-blue-container flex items-center justify-center gap-2 hover:shadow-md transition-all state-layer text-sm font-medium">
-                  <Share2 size={18} />
-                  シェア
+                <button
+                  onClick={onClose}
+                  className="flex-1 h-12 bg-shu flex items-center justify-center gap-2 font-mono text-xs tracking-wider text-washi hover:bg-shu-light transition-colors"
+                >
+                  Close
                 </button>
-              </div>
+              </motion.div>
             </div>
           </motion.div>
         </div>

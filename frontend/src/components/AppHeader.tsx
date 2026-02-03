@@ -1,4 +1,4 @@
-import clsx from 'clsx';
+import { motion } from 'framer-motion';
 import { WalletConnect } from './WalletConnect';
 
 export type AppPage = 'saisen' | 'mypage';
@@ -10,48 +10,61 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ activePage, onChange, showMyPage }: AppHeaderProps) {
-  const tabBase =
-    'px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-medium rounded-full transition-colors state-layer';
-
   return (
-    <header className="mb-6 sm:mb-8 relative z-20">
-      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start">
-        <div className="flex justify-between items-start sm:block">
-          <div>
-            <h1 className="text-xl sm:type-headline-medium font-bold tracking-tight leading-none text-md-primary">
-              HAKUSAN<br />HIME
+    <header className="mb-12 sm:mb-16">
+      <div className="flex items-start justify-between">
+        {/* Logo - Vertical Japanese aesthetic */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className="flex items-start gap-4"
+        >
+          {/* Shrine name in vertical */}
+          <div className="writing-vertical font-serif text-sm tracking-[0.3em] text-washi/60 hidden sm:block">
+            白山比咩神社
+          </div>
+
+          {/* Main logo */}
+          <div className="flex flex-col">
+            <h1 className="font-serif text-2xl sm:text-3xl tracking-[0.1em] text-washi leading-none">
+              御賽銭
             </h1>
-            <p className="text-xs sm:type-label-large text-md-secondary font-bold tracking-[0.2em] mt-1 opacity-80">
-              白山比咩神社
+            <p className="font-mono text-[10px] tracking-[0.3em] text-washi/40 mt-2 uppercase">
+              Digital Osaisen
             </p>
           </div>
-          <div className="sm:hidden">
-            <WalletConnect />
-          </div>
-        </div>
+        </motion.div>
 
-        <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3">
-          <div className="hidden sm:block">
-            <WalletConnect />
-          </div>
+        {/* Right side: Navigation + Wallet */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+          className="flex items-center gap-3 sm:gap-4"
+        >
           {showMyPage && (
-            <div className="inline-flex items-center gap-1 p-1 rounded-full bg-md-surface-container-high border border-md-outline-variant/30">
+            <nav className="flex items-center">
               <button
                 type="button"
-                onClick={() => onChange('mypage')}
-                aria-current={activePage === 'mypage' ? 'page' : undefined}
-                className={clsx(
-                  tabBase,
-                  activePage === 'mypage'
-                    ? 'bg-md-blue-container text-md-on-blue-container shadow-sm'
-                    : 'text-md-blue hover:text-white hover:bg-md-blue-container/40'
-                )}
+                onClick={() => onChange(activePage === 'saisen' ? 'mypage' : 'saisen')}
+                className="group relative font-mono text-xs tracking-[0.15em] uppercase text-washi/60 hover:text-washi transition-colors duration-300 py-2 px-3"
               >
-                マイページ
+                <span className="relative z-10">
+                  {activePage === 'saisen' ? '御朱印帳' : '奉納'}
+                </span>
+                <motion.div
+                  className="absolute bottom-1 left-3 right-3 h-px bg-shu"
+                  initial={{ scaleX: 0 }}
+                  whileHover={{ scaleX: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
               </button>
-            </div>
+            </nav>
           )}
-        </div>
+
+          <WalletConnect />
+        </motion.div>
       </div>
     </header>
   );

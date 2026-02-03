@@ -1,136 +1,288 @@
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
-  /* MD3 Color System - Dark Theme Base with Serious Pop Accents */
-  
-  /* Primary: Neon Red (Shrine) */
-  --color-md-primary: #FFB4AB;         /* Light Red for text/icons on dark */
-  --color-md-on-primary: #690005;      /* Dark Red for text on primary */
-  --color-md-primary-container: #930006; /* Deep Red for filled buttons */
-  --color-md-on-primary-container: #FFDAD6; /* Lightest Red */
+  /* 静寂の余白 - Zen Minimalism Color System */
 
-  /* Secondary: Gold/Lime (Fortune) */
-  --color-md-secondary: #D7C986;
-  --color-md-on-secondary: #3A3000;
-  --color-md-secondary-container: #514600;
-  --color-md-on-secondary-container: #F4E59F;
+  /* Primary: 墨黒 (Sumi Black) */
+  --color-sumi: #0A0A0A;
+  --color-sumi-light: #1A1A1A;
+  --color-sumi-lighter: #2A2A2A;
 
-  /* Custom Blue: (New for Wallet) */
-  --color-md-blue: #A2C9FF;
-  --color-md-on-blue: #00315B;
-  --color-md-blue-container: #004881;
-  --color-md-on-blue-container: #D1E4FF;
-  
-  /* Tertiary: Electric Purple (Mystery) */
-  --color-md-tertiary: #D0BCFF;
-  --color-md-on-tertiary: #381E72;
-  --color-md-tertiary-container: #4F378B;
-  --color-md-on-tertiary-container: #EADDFF;
+  /* Secondary: 和紙 (Washi - Japanese Paper) */
+  --color-washi: #F5F2ED;
+  --color-washi-dark: #E8E4DD;
+  --color-washi-darker: #D4CFC6;
 
-  /* Error */
-  --color-md-error: #FFB4AB;
-  --color-md-on-error: #690005;
-  --color-md-error-container: #930006;
-  --color-md-on-error-container: #FFDAD6;
+  /* Accent: 朱 (Shu - Vermillion) */
+  --color-shu: #C53D43;
+  --color-shu-light: #E85A5F;
+  --color-shu-dark: #9A2F34;
 
-  /* Surface (Dark Mode) */
-  --color-md-surface: #141212;         /* Base Background */
-  --color-md-on-surface: #E6E1E5;      /* Main Text */
-  --color-md-on-surface-variant: #CAC4D0; /* Muted Text */
-  --color-md-outline: #938F99;         /* Borders */
-  --color-md-outline-variant: #49454F; /* Faint Borders */
-  
-  /* Surface Containers (Elevation by Tone) */
-  --color-md-surface-container-lowest: #0F0D0D;
-  --color-md-surface-container-low: #1D1B20;
-  --color-md-surface-container: #211F26;       /* Standard Card */
-  --color-md-surface-container-high: #2B2930;
-  --color-md-surface-container-highest: #36343B;
+  /* Functional */
+  --color-success: #4A7C59;
+  --color-error: #C53D43;
 
   /* Typography */
-  --font-family-sans: 'Roboto', 'Noto Sans JP', sans-serif;
-  --font-family-display: 'Inter', sans-serif;
+  --font-serif: 'Shippori Mincho', 'Noto Serif JP', serif;
+  --font-mono: 'DM Mono', 'JetBrains Mono', monospace;
+  --font-sans: 'Inter', sans-serif;
+
+  /* Spacing Scale - Based on 8px grid */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 2rem;
+  --space-xl: 4rem;
+  --space-2xl: 8rem;
 }
 
 :root {
-  font-family: var(--font-family-sans);
-  line-height: 1.5;
+  font-family: var(--font-sans);
+  line-height: 1.6;
   font-weight: 400;
-  color: var(--color-md-on-surface);
-  background-color: var(--color-md-surface);
+  color: var(--color-washi);
+  background-color: var(--color-sumi);
+  font-feature-settings: 'palt' 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   margin: 0;
   min-width: 320px;
-  min-height: 100vh;
-  /* Subtle gradient mesh compatible with MD3 */
-  background: radial-gradient(circle at 50% 0%, rgba(147, 0, 6, 0.15), transparent 60%),
-              var(--color-md-surface);
+  min-height: 100dvh;
+  background: var(--color-sumi);
   overflow-x: hidden;
 }
 
-/* MD3 Elevation & State Layers */
-.md-card {
-  background-color: var(--color-md-surface-container);
-  border-radius: 1.5rem; /* 24px - Medium/Large Card */
-  transition: background-color 0.2s, box-shadow 0.2s;
+/* Selection */
+::selection {
+  background: var(--color-shu);
+  color: var(--color-washi);
 }
 
-.md-card-elevated {
-  background-color: var(--color-md-surface-container-low);
-  box-shadow: 0 4px 8px 3px rgba(0, 0, 0, 0.15); /* MD3 Elevation 1 */
+/* Scrollbar - Minimal */
+::-webkit-scrollbar {
+  width: 4px;
 }
 
-/* MD3 State Layer (Hover overlay) */
-.state-layer {
-  position: relative;
-  overflow: hidden;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.state-layer::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-color: currentColor;
-  opacity: 0;
-  transition: opacity 0.2s;
-  pointer-events: none;
-}
-
-.state-layer:hover::before {
-  opacity: 0.08;
-}
-
-.state-layer:active::before {
-  opacity: 0.12;
+::-webkit-scrollbar-thumb {
+  background: var(--color-sumi-lighter);
+  border-radius: 2px;
 }
 
 /* Typography Utilities */
-.type-display-large {
-  font-family: var(--font-family-display);
-  font-size: 3.56rem; /* 57px */
-  line-height: 1.12;
-  letter-spacing: -0.25px;
-  font-weight: 400;
+.font-serif {
+  font-family: var(--font-serif);
 }
 
-.type-headline-medium {
-  font-family: var(--font-family-sans);
-  font-size: 1.75rem; /* 28px */
-  line-height: 1.28;
-  font-weight: 400;
+.font-mono {
+  font-family: var(--font-mono);
 }
 
-.type-label-large {
-  font-family: var(--font-family-sans);
-  font-size: 0.875rem; /* 14px */
-  line-height: 1.4;
-  font-weight: 500;
-  letter-spacing: 0.1px;
+/* Vertical Writing (縦書き) */
+.writing-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
 }
 
-/* Hide scrollbar */
+/* Zen Button Base */
+.zen-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-washi-darker);
+  background: transparent;
+  color: var(--color-washi);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.875rem 2rem;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zen-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--color-washi);
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zen-button:hover::before {
+  transform: translateY(0);
+}
+
+.zen-button:hover {
+  color: var(--color-sumi);
+}
+
+.zen-button span {
+  position: relative;
+  z-index: 1;
+}
+
+/* Primary Button */
+.zen-button-primary {
+  background: var(--color-shu);
+  border-color: var(--color-shu);
+  color: var(--color-washi);
+}
+
+.zen-button-primary::before {
+  background: var(--color-washi);
+}
+
+.zen-button-primary:hover {
+  color: var(--color-shu);
+}
+
+/* Ripple Effect */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--color-shu);
+  animation: ripple 1.5s ease-out forwards;
+  pointer-events: none;
+}
+
+/* Breathing Animation */
+@keyframes breathe {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.02);
+  }
+}
+
+.animate-breathe {
+  animation: breathe 4s ease-in-out infinite;
+}
+
+/* Fade In Up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Stagger Delays */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* Ink Spread */
+@keyframes inkSpread {
+  0% {
+    clip-path: circle(0% at 50% 50%);
+  }
+  100% {
+    clip-path: circle(150% at 50% 50%);
+  }
+}
+
+.animate-ink-spread {
+  animation: inkSpread 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Grain Texture Overlay */
+.grain-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Input Styling */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Focus States */
+*:focus-visible {
+  outline: 1px solid var(--color-shu);
+  outline-offset: 2px;
+}
+
+/* Card */
+.zen-card {
+  background: var(--color-sumi-light);
+  border: 1px solid var(--color-sumi-lighter);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.zen-card:hover {
+  border-color: var(--color-washi-darker);
+}
+
+/* Divider */
+.zen-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-sumi-lighter) 20%,
+    var(--color-sumi-lighter) 80%,
+    transparent
+  );
+}
+
+/* WalletConnect Modal Override */
+wcm-modal,
+w3m-modal,
+[data-testid="wallet-connect-modal"] {
+  z-index: 9999 !important;
+}
+
+/* Hide scrollbar utility */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
@@ -139,9 +291,7 @@ body {
   scrollbar-width: none;
 }
 
-/* WalletConnect Modal - 最前面に表示 */
-wcm-modal,
-w3m-modal,
-[data-testid="wallet-connect-modal"] {
-  z-index: 9999 !important;
+/* Safe area padding */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
 }
