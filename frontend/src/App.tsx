@@ -1,12 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAccount, WagmiProvider } from 'wagmi';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AnimatePresence, motion } from 'framer-motion';
 import { config } from './lib/wagmiConfig';
 import { AppHeader, type AppPage } from './components/AppHeader';
 import { MyPage } from './pages/MyPage';
 import { SaisenPage } from './pages/Saisen';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5分間キャッシュ有効
+      gcTime: 1000 * 60 * 30, // 30分間GC対象外
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const getPageFromHash = (): AppPage => {
   if (typeof window === 'undefined') return 'saisen';
@@ -51,18 +60,40 @@ function AppShell() {
   );
 
   return (
-    <div className="min-h-[100dvh] relative flex flex-col px-4 py-5 sm:p-6 max-w-lg mx-auto bg-md-surface text-md-on-surface font-sans">
-      <AppHeader
-        activePage={activePage}
-        onChange={handleChangePage}
-        showMyPage={canShowMyPage}
-      />
-      {activePage === 'saisen' ? <SaisenPage /> : <MyPage />}
-      <footer className="mt-6 sm:mt-8 text-center pb-safe">
-        <p className="text-[10px] sm:text-xs text-md-on-surface-variant opacity-60 font-mono">
-          POWERED BY kuroko
-        </p>
-      </footer>
+    <div className="min-h-[100dvh] relative flex flex-col grain-overlay">
+      {/* Subtle gradient accent */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-shu/5 blur-[150px] rounded-full" />
+      </div>
+
+      <div className="relative z-10 flex flex-col min-h-[100dvh] px-6 py-8 sm:px-8 sm:py-10 max-w-2xl mx-auto w-full">
+        <AppHeader
+          activePage={activePage}
+          onChange={handleChangePage}
+          showMyPage={canShowMyPage}
+        />
+
+        <AnimatePresence mode="wait">
+          <motion.main
+            key={activePage}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+            className="flex-1 flex flex-col"
+          >
+            {activePage === 'saisen' ? <SaisenPage /> : <MyPage />}
+          </motion.main>
+        </AnimatePresence>
+
+        <footer className="mt-auto pt-16 pb-safe">
+          <div className="zen-divider mb-6" />
+          <div className="flex items-center justify-between text-[10px] tracking-[0.2em] uppercase text-washi/30 font-mono">
+            <span>Osaisen</span>
+            <span>Powered by Kuroko</span>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }

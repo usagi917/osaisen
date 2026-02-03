@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Coins } from 'lucide-react';
 
 interface AmountInputProps {
   value: number;
@@ -26,62 +25,101 @@ export function AmountInput({
   const hasEnoughBalance = balanceNumber === undefined || value <= balanceNumber;
 
   return (
-    <div className="w-full max-w-md flex flex-col items-center gap-6 py-6">
-      {/* Balance Subtitle */}
-      <motion.div 
+    <div className="w-full flex flex-col items-center">
+      {/* Balance display */}
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="flex items-center gap-2 text-md-on-surface-variant text-sm font-medium bg-md-surface-container px-3 py-1 rounded-full"
+        className="mb-8 text-center"
       >
-        <Coins size={14} />
-        <span>Balance: {balanceNumber?.toLocaleString() ?? '...'} JPYC</span>
+        <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-washi/40 mb-1">
+          Balance
+        </p>
+        <p className="font-mono text-sm text-washi/70">
+          {balanceNumber?.toLocaleString() ?? '---'} <span className="text-washi/40">JPYC</span>
+        </p>
       </motion.div>
 
-      {/* Hero Input (MD3 Typography) */}
-      <div className="relative w-full flex justify-center items-baseline gap-1">
-        <input
-          type="number"
-          value={value || ''}
-          onChange={(e) => onChange(Number(e.target.value))}
-          min={minAmount}
-          placeholder="0"
-          className="w-full text-center bg-transparent border-none p-0 type-display-large font-normal text-md-on-surface focus:ring-0 focus:outline-none placeholder-md-on-surface-variant/20 caret-md-primary"
-        />
-        <span className="type-headline-medium text-md-on-surface-variant absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none">
+      {/* Main input area */}
+      <div className="relative w-full flex flex-col items-center mb-8">
+        {/* Large number input */}
+        <div className="relative flex items-baseline justify-center gap-2">
+          <input
+            type="number"
+            value={value || ''}
+            onChange={(e) => onChange(Number(e.target.value))}
+            min={minAmount}
+            placeholder="0"
+            className="w-full max-w-[240px] text-center bg-transparent border-none p-0 font-serif text-5xl sm:text-6xl md:text-7xl text-washi focus:ring-0 focus:outline-none placeholder:text-washi/10 caret-shu"
+          />
+        </div>
+
+        {/* Currency label */}
+        <p className="font-mono text-xs tracking-[0.3em] uppercase text-washi/30 mt-4">
           JPYC
-        </span>
+        </p>
+
+        {/* Underline */}
+        <div className="w-full max-w-[200px] mt-4">
+          <div className="h-px bg-sumi-lighter" />
+          <motion.div
+            className="h-px bg-shu -mt-px origin-left"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: isValidAmount ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+          />
+        </div>
       </div>
-      
-      {/* Validation Line */}
-      <div className="h-6">
+
+      {/* Validation message */}
+      <div className="h-6 mb-6">
         {!isValidAmount ? (
-          <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-md-error text-sm font-medium bg-md-error-container/10 px-3 py-0.5 rounded-md">
-            最低 {minAmount} JPYC から
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="font-mono text-xs text-shu"
+          >
+            {minAmount} JPYC from
           </motion.p>
         ) : !hasEnoughBalance ? (
-          <motion.p initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} className="text-md-error text-sm font-medium bg-md-error-container/10 px-3 py-0.5 rounded-md">
-            残高不足
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="font-mono text-xs text-shu"
+          >
+            Insufficient balance
           </motion.p>
         ) : null}
       </div>
 
-      {/* Preset Chips (MD3 Filter Chips) */}
-      <div className="flex flex-wrap justify-center gap-3 w-full px-2">
-        {PRESET_AMOUNTS.map((preset) => {
+      {/* Preset amounts */}
+      <div className="flex flex-wrap justify-center gap-2">
+        {PRESET_AMOUNTS.map((preset, index) => {
           const isSelected = value === preset;
           return (
             <motion.button
               key={preset}
-              whileTap={{ scale: 0.95 }}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
               onClick={() => onChange(preset)}
-              className={`h-8 px-4 rounded-lg text-sm font-medium transition-colors border relative overflow-hidden state-layer
+              className={`
+                relative px-4 py-2 font-mono text-xs tracking-wider
+                border transition-all duration-300
                 ${isSelected
-                  ? 'bg-md-secondary-container text-md-on-secondary-container border-transparent'
-                  : 'bg-transparent text-md-on-surface-variant border-md-outline-variant hover:bg-md-on-surface/5'
-                }`}
+                  ? 'border-shu text-shu bg-shu/5'
+                  : 'border-sumi-lighter text-washi/50 hover:border-washi/30 hover:text-washi/80'
+                }
+              `}
             >
-              {isSelected && <span className="mr-1.5">✓</span>}
-              ¥{preset.toLocaleString()}
+              {isSelected && (
+                <motion.div
+                  layoutId="preset-indicator"
+                  className="absolute inset-0 border border-shu"
+                  transition={{ duration: 0.2 }}
+                />
+              )}
+              <span className="relative z-10">¥{preset.toLocaleString()}</span>
             </motion.button>
           );
         })}
