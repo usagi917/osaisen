@@ -59,11 +59,15 @@ export function ResultModal({
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="relative w-full max-w-md bg-sumi border border-sumi-lighter p-8 overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="奉納結果"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
             <button
               onClick={onClose}
+              aria-label="閉じる"
               className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-washi/30 hover:text-washi transition-colors"
             >
               <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -163,7 +167,7 @@ export function ResultModal({
                     </div>
                     <div className="text-left">
                       <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-shu mb-1">
-                        NFT Granted
+                        御朱印を授与しました
                       </p>
                       <p className="font-serif text-base text-washi">
                         {monthId && formatMonthId(monthId)} 御朱印
@@ -202,14 +206,14 @@ export function ResultModal({
                       <path d="M9 1H13V5" />
                       <path d="M13 1L6 8" />
                     </svg>
-                    Explorer
+                    取引詳細
                   </a>
                 )}
                 <button
                   onClick={onClose}
                   className="flex-1 h-12 bg-shu flex items-center justify-center gap-2 font-mono text-xs tracking-wider text-washi hover:bg-shu-light transition-colors"
                 >
-                  Close
+                  閉じる
                 </button>
               </motion.div>
             </div>

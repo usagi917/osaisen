@@ -2,6 +2,7 @@ import { useConnect, useAccount, useDisconnect, type Connector } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useMemo } from 'react';
 import { isWalletConnectEnabled } from '../lib/wagmiConfig';
+import { humanizeError } from '../lib/errorMessages';
 
 const isMobile = () => /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
@@ -74,7 +75,7 @@ export function WalletConnect() {
                 onClick={handleDisconnect}
                 className="w-full text-left px-3 py-2 font-mono text-xs tracking-wider text-shu hover:bg-sumi-lighter transition-colors"
               >
-                Disconnect
+                接続解除
               </button>
             </motion.div>
           )}
@@ -103,7 +104,7 @@ export function WalletConnect() {
             onClick={() => setShowConnectors(true)}
             className="zen-button"
           >
-            <span>Connect</span>
+            <span>接続する</span>
           </motion.button>
         ) : (
           <motion.div
@@ -113,26 +114,32 @@ export function WalletConnect() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
             className="fixed inset-4 sm:absolute sm:inset-auto sm:right-0 sm:top-0 sm:w-80 bg-sumi border border-sumi-lighter p-6 z-50 max-h-[85vh] overflow-y-auto no-scrollbar"
+            role="dialog"
+            aria-label="ウォレット接続"
           >
             {/* Header */}
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-2">
               <h3 className="font-serif text-lg tracking-wide text-washi">
                 接続
               </h3>
               <button
                 onClick={() => setShowConnectors(false)}
                 className="w-8 h-8 flex items-center justify-center text-washi/40 hover:text-washi transition-colors"
+                aria-label="閉じる"
               >
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                   <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="1.5" />
                 </svg>
               </button>
             </div>
+            <p className="font-mono text-[10px] text-washi/30 mb-8">
+              ウォレットはデジタルなお財布です
+            </p>
 
             {/* Recommended */}
             <div className="mb-6">
               <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-washi/40 mb-3">
-                Recommended
+                おすすめ
               </p>
               <button
                 disabled={!walletConnectConnector || isPending}
@@ -148,7 +155,10 @@ export function WalletConnect() {
                       HashPort Wallet
                     </p>
                     <p className="font-mono text-[10px] text-washi/40">
-                      {mobile ? 'Tap to connect' : 'Scan QR code'}
+                      {mobile ? 'タップして接続' : 'QRコードをスキャン'}
+                    </p>
+                    <p className="font-mono text-[10px] text-washi/30 mt-1">
+                      初めての方におすすめ
                     </p>
                   </div>
                   <svg
@@ -166,17 +176,17 @@ export function WalletConnect() {
               {mobile && (
                 <div className="mt-3 p-3 bg-sumi-light border border-sumi-lighter">
                   <p className="font-mono text-[10px] text-washi/60 leading-relaxed">
-                    1. Tap button above<br />
-                    2. Copy the link<br />
-                    3. Open HashPort Wallet<br />
-                    4. Connect via WalletConnect
+                    1. 上のボタンをタップ<br />
+                    2. リンクをコピー<br />
+                    3. HashPort Walletを開く<br />
+                    4. WalletConnectで接続
                   </p>
                 </div>
               )}
 
               {!isWalletConnectEnabled && (
                 <p className="mt-3 font-mono text-[10px] text-shu">
-                  WalletConnect Project ID not configured
+                  この接続方法は現在ご利用いただけません
                 </p>
               )}
             </div>
@@ -185,7 +195,7 @@ export function WalletConnect() {
             <div>
               <div className="zen-divider mb-4" />
               <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-washi/40 mb-3">
-                Other Wallets
+                その他
               </p>
               {metaMaskConnector && (
                 <button
@@ -194,9 +204,14 @@ export function WalletConnect() {
                   className="w-full p-3 border border-sumi-lighter hover:border-washi/30 transition-all duration-300 text-left group"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-mono text-sm text-washi/80">
-                      MetaMask
-                    </span>
+                    <div>
+                      <p className="font-mono text-sm text-washi/80">
+                        MetaMask
+                      </p>
+                      <p className="font-mono text-[10px] text-washi/30 mt-1">
+                        暗号資産に慣れている方向け
+                      </p>
+                    </div>
                     <svg
                       width="16"
                       height="16"
@@ -212,9 +227,16 @@ export function WalletConnect() {
             </div>
 
             {error && (
-              <p className="mt-4 font-mono text-[10px] text-shu">
-                {error.message}
-              </p>
+              <div className="mt-4">
+                <p className="font-mono text-[10px] text-shu">
+                  {humanizeError(error).title}
+                </p>
+                {humanizeError(error).action && (
+                  <p className="font-mono text-[10px] text-washi/40 mt-1">
+                    {humanizeError(error).action}
+                  </p>
+                )}
+              </div>
             )}
           </motion.div>
         )}

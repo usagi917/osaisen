@@ -52,7 +52,7 @@ export function StatusDisplay({
 
           <div>
             <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-washi/40 mb-1">
-              {currentMonthLabel} NFT
+              {currentMonthLabel} 御朱印
             </p>
             <p className={`font-serif text-base ${isEligible ? 'text-washi' : 'text-washi/60'}`}>
               {isEligible ? '今月の御朱印を受け取る' : '授与済み'}
@@ -64,7 +64,7 @@ export function StatusDisplay({
         {Number(nftBalance) > 0 && (
           <div className="text-right">
             <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-washi/40 mb-1">
-              Total
+              合計
             </p>
             <p className="font-mono text-lg text-washi">
               {nftBalance.toString()}
@@ -72,6 +72,13 @@ export function StatusDisplay({
           </div>
         )}
       </div>
+
+      {/* Help text */}
+      {isEligible && (
+        <p className="relative z-10 mt-4 font-mono text-[10px] text-washi/30">
+          奉納すると毎月の記念スタンプがもらえます
+        </p>
+      )}
 
       {/* Decorative corner */}
       {isEligible && (

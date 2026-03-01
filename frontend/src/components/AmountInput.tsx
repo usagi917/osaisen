@@ -33,7 +33,7 @@ export function AmountInput({
         className="mb-8 text-center"
       >
         <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-washi/40 mb-1">
-          Balance
+          残高
         </p>
         <p className="font-mono text-sm text-washi/70">
           {balanceNumber?.toLocaleString() ?? '---'} <span className="text-washi/40">JPYC</span>
@@ -50,6 +50,7 @@ export function AmountInput({
             onChange={(e) => onChange(Number(e.target.value))}
             min={minAmount}
             placeholder="0"
+            aria-label="奉納金額（JPYC）"
             className="w-full max-w-[240px] text-center bg-transparent border-none p-0 font-serif text-5xl sm:text-6xl md:text-7xl text-washi focus:ring-0 focus:outline-none placeholder:text-washi/10 caret-shu"
           />
         </div>
@@ -79,7 +80,7 @@ export function AmountInput({
             animate={{ opacity: 1, y: 0 }}
             className="font-mono text-xs text-shu"
           >
-            {minAmount} JPYC from
+            {minAmount} JPYC以上で奉納できます
           </motion.p>
         ) : !hasEnoughBalance ? (
           <motion.p
@@ -87,7 +88,7 @@ export function AmountInput({
             animate={{ opacity: 1, y: 0 }}
             className="font-mono text-xs text-shu"
           >
-            Insufficient balance
+            残高が不足しています
           </motion.p>
         ) : null}
       </div>
@@ -119,7 +120,7 @@ export function AmountInput({
                   transition={{ duration: 0.2 }}
                 />
               )}
-              <span className="relative z-10">¥{preset.toLocaleString()}</span>
+              <span className="relative z-10">{preset.toLocaleString()}</span>
             </motion.button>
           );
         })}
