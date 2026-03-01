@@ -51,16 +51,16 @@ export function SaisenButton({
   const isValidAmount = amount >= minAmount;
 
   const getButtonState = () => {
-    if (!isValidAmount) return { text: '金額を入力', disabled: true, loading: false, type: 'disabled' };
-    if (!hasEnoughBalance) return { text: '残高不足', disabled: true, loading: false, type: 'disabled' };
+    if (!isValidAmount) return { text: '金額を入力', disabled: true, loading: false, type: 'disabled', description: '' };
+    if (!hasEnoughBalance) return { text: '残高不足', disabled: true, loading: false, type: 'disabled', description: '' };
 
-    if (isApproving) return { text: '承認中', disabled: true, loading: true, type: 'loading' };
-    if (needsApproval) return { text: 'JPYCを許可', disabled: false, loading: false, type: 'secondary' };
+    if (isApproving) return { text: '承認中', disabled: true, loading: true, type: 'loading', description: 'ウォレットで許可を承認してください' };
+    if (needsApproval) return { text: 'JPYCを許可', disabled: false, loading: false, type: 'secondary', description: '初回のみ必要な手続きです。この後、奉納に進みます' };
 
-    if (isSending) return { text: '奉納中', disabled: true, loading: true, type: 'loading' };
-    if (isConfirming) return { text: '確認中', disabled: true, loading: true, type: 'loading' };
+    if (isSending) return { text: '奉納中', disabled: true, loading: true, type: 'loading', description: 'ウォレットで奉納を承認してください' };
+    if (isConfirming) return { text: '確認中', disabled: true, loading: true, type: 'loading', description: '処理には数十秒かかることがあります' };
 
-    return { text: '奉納する', disabled: false, loading: false, type: 'primary' };
+    return { text: '奉納する', disabled: false, loading: false, type: 'primary', description: '' };
   };
 
   const state = getButtonState();
@@ -72,6 +72,7 @@ export function SaisenButton({
         whileTap={!state.disabled ? { scale: 0.99 } : {}}
         onClick={needsApproval ? onApprove : onSaisen}
         disabled={state.disabled}
+        aria-busy={state.loading}
         className={`
           relative w-full max-w-md h-14 font-serif text-lg tracking-[0.1em]
           flex items-center justify-center gap-3
@@ -108,13 +109,13 @@ export function SaisenButton({
         </span>
       </motion.button>
 
-      {needsApproval && !isApproving && (
+      {state.description && (
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="mt-4 font-mono text-[10px] tracking-wider text-washi/40 text-center"
         >
-          Initial approval required for JPYC
+          {state.description}
         </motion.p>
       )}
     </div>

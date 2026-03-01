@@ -11,6 +11,7 @@ import { useNftEligibility } from '../hooks/useNftEligibility';
 import { useSaisen } from '../hooks/useSaisen';
 import { DEFAULT_CHAIN_ID, resolveSupportedChainId } from '../lib/chains';
 import { JPYC_DECIMALS } from '../lib/contracts';
+import { humanizeError } from '../lib/errorMessages';
 
 const MIN_AMOUNT = 115;
 
@@ -192,8 +193,28 @@ export function SaisenPage() {
             >
               <div className="w-px h-12 bg-gradient-to-b from-transparent via-sumi-lighter to-transparent" />
               <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-washi/30">
-                Connect wallet to begin
+                ウォレットを接続して始めましょう
               </p>
+            </motion.div>
+
+            {/* How to use */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="mt-12 w-full max-w-xs"
+            >
+              <div className="space-y-3">
+                <p className="font-mono text-[10px] text-washi/30">
+                  <span className="text-washi/50">01</span>{'  '}ウォレットを接続 — デジタルなお財布を繋げます
+                </p>
+                <p className="font-mono text-[10px] text-washi/30">
+                  <span className="text-washi/50">02</span>{'  '}金額を選んで奉納 — 115 JPYC（約115円相当）から
+                </p>
+                <p className="font-mono text-[10px] text-washi/30">
+                  <span className="text-washi/50">03</span>{'  '}御朱印を授与 — 毎月の記念スタンプを受け取れます
+                </p>
+              </div>
             </motion.div>
           </motion.div>
         ) : (
@@ -258,9 +279,13 @@ export function SaisenPage() {
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-6 p-4 border border-shu/30 bg-shu/5"
+                  aria-live="polite"
                 >
                   <p className="font-mono text-xs text-shu text-center">
-                    {saisenError.message}
+                    {humanizeError(saisenError).title}
+                  </p>
+                  <p className="font-mono text-[10px] text-washi/40 text-center mt-1">
+                    {humanizeError(saisenError).action}
                   </p>
                 </motion.div>
               )}

@@ -6,6 +6,7 @@ import { StatusDisplay } from '../components/StatusDisplay';
 import { useGoshuinHistory } from '../hooks/useGoshuinHistory';
 import { useNftEligibility } from '../hooks/useNftEligibility';
 import { getContracts, NFT_ABI } from '../lib/contracts';
+import { humanizeError } from '../lib/errorMessages';
 
 const formatMonthId = (monthId?: bigint): string => {
   if (!monthId || monthId === 0n) return '';
@@ -276,7 +277,7 @@ export function MyPage() {
             ウォレットを接続してください
           </p>
           <p className="font-mono text-[10px] tracking-wider text-washi/30">
-            Connect wallet to view collection
+            ウォレットを接続すると御朱印帳を見られます
           </p>
         </motion.div>
       ) : (
@@ -304,14 +305,14 @@ export function MyPage() {
             <div className="flex items-center gap-6">
               <div>
                 <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-washi/40 mb-1">
-                  Total
+                  合計
                 </p>
                 <p className="font-mono text-lg text-washi">{months.length}</p>
               </div>
               <div className="w-px h-8 bg-sumi-lighter" />
               <div>
                 <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-washi/40 mb-1">
-                  Latest
+                  最新
                 </p>
                 <p className="font-mono text-sm text-washi">{lastMintLabel || '---'}</p>
               </div>
@@ -320,6 +321,7 @@ export function MyPage() {
             <button
               onClick={refetch}
               disabled={isLoading}
+              aria-label="御朱印一覧を更新"
               className="p-2 text-washi/30 hover:text-washi transition-colors disabled:opacity-50"
             >
               <svg
@@ -339,7 +341,7 @@ export function MyPage() {
 
           {isPartial && (
             <p className="font-mono text-[10px] text-washi/30">
-              Recent blocks only. Configure VITE_ROUTER_START_BLOCK_* for full history.
+              最近の記録のみ表示しています
             </p>
           )}
           {rangeInfo && <div className="sr-only" />}
@@ -350,7 +352,10 @@ export function MyPage() {
               animate={{ opacity: 1 }}
               className="p-4 border border-shu/30 bg-shu/5"
             >
-              <p className="font-mono text-xs text-shu">{error.message}</p>
+              <p className="font-mono text-xs text-shu">{humanizeError(error).title}</p>
+              {humanizeError(error).action && (
+                <p className="font-mono text-[10px] text-washi/40 mt-1">{humanizeError(error).action}</p>
+              )}
             </motion.div>
           )}
 
@@ -374,7 +379,7 @@ export function MyPage() {
                 まだ御朱印がありません
               </p>
               <p className="font-mono text-[10px] tracking-wider text-washi/20">
-                Make an offering to receive your first goshuin
+                奉納すると御朱印がもらえます
               </p>
             </motion.div>
           ) : (
@@ -401,7 +406,7 @@ export function MyPage() {
                         return (
                           <div className="absolute inset-0 flex items-center justify-center">
                             <p className="font-mono text-[10px] text-washi/30">
-                              {isMetadataLoading ? 'Loading...' : 'No image'}
+                              {isMetadataLoading ? '読み込み中...' : '画像なし'}
                             </p>
                           </div>
                         );
@@ -425,7 +430,7 @@ export function MyPage() {
                   {/* Info */}
                   <div className="p-3 bg-sumi">
                     <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-washi/40 mb-1">
-                      Goshuin
+                      御朱印
                     </p>
                     <p className="font-serif text-sm text-washi">
                       {formatMonthId(monthId)}
