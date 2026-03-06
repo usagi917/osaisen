@@ -17,25 +17,16 @@ test.describe('Offering Flow - Pre-Connection State', () => {
     await page.goto('/');
   });
 
-  test('should show initial state correctly', async ({ page }) => {
-    // Amount input should be visible
-    const amountInput = page.locator('input').first();
-    await expect(amountInput).toBeVisible();
-
-    // Should show minimum amount info
-    await expect(page.locator('text=/115|最小/i')).toBeVisible();
+  test('should show landing page when not connected', async ({ page }) => {
+    // Landing page should show hero text and how-to section with 115 JPYC info
+    await expect(page.locator('text=デジタル')).toBeVisible();
+    await expect(page.locator('text=115')).toBeVisible();
   });
 
-  test('should validate amount before connection', async ({ page }) => {
-    const amountInput = page.locator('input').first();
-
-    // Enter valid amount
-    await amountInput.fill('200');
-    await expect(amountInput).toHaveValue('200');
-
-    // Enter invalid amount
-    await amountInput.fill('50');
-    // Should show validation message or error styling
+  test('should not show amount input before connection', async ({ page }) => {
+    // In new UI, amount input is only visible when wallet is connected
+    const amountInput = page.locator('input');
+    await expect(amountInput).toHaveCount(0);
   });
 });
 
@@ -47,7 +38,10 @@ test.describe('Offering Flow - Connected State (Mock)', () => {
   });
 
   test('should show wallet address when connected', async ({ page }) => {
-    // Try to connect
+    // Open connector panel first
+    await page.getByRole('button', { name: /接続する/i }).click();
+
+    // Try to connect via MetaMask
     const metaMaskButton = page.getByRole('button', { name: /MetaMask/i });
     if (await metaMaskButton.isVisible()) {
       await metaMaskButton.click();
@@ -61,6 +55,9 @@ test.describe('Offering Flow - Connected State (Mock)', () => {
   });
 
   test('should enable offering after connection', async ({ page }) => {
+    // Open connector panel first
+    await page.getByRole('button', { name: /接続する/i }).click();
+
     const metaMaskButton = page.getByRole('button', { name: /MetaMask/i });
     if (await metaMaskButton.isVisible()) {
       await metaMaskButton.click();

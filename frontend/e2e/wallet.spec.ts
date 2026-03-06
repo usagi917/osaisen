@@ -7,28 +7,33 @@ test.describe('Wallet Connection (Mock)', () => {
     await page.goto('/');
   });
 
-  test('should detect injected wallet', async ({ page }) => {
-    // Wait for page to detect the mock wallet
+  test('should show connect button and reveal wallet options', async ({ page }) => {
     await page.waitForTimeout(500);
 
-    // MetaMask button should be visible
+    // Click "接続する" to open connector panel
+    const connectButton = page.getByRole('button', { name: /接続する/i });
+    await expect(connectButton).toBeVisible();
+    await connectButton.click();
+
+    // Wallet dialog should appear
+    const walletDialog = page.locator('[role="dialog"]');
+    await expect(walletDialog).toBeVisible();
+
+    // MetaMask button should be visible inside the dialog
     const metaMaskButton = page.getByRole('button', { name: /MetaMask/i });
     await expect(metaMaskButton).toBeVisible();
+    await expect(metaMaskButton).toBeEnabled();
   });
 
-  test('should show wallet options', async ({ page }) => {
+  test('should show wallet options after clicking connect', async ({ page }) => {
     await page.waitForTimeout(500);
+
+    // Open connector panel
+    await page.getByRole('button', { name: /接続する/i }).click();
 
     // Look for wallet connection options
-    const walletSection = page.locator('text=/ウォレット|Wallet|接続/i');
+    const walletSection = page.locator('text=/ウォレット|接続/i');
     await expect(walletSection.first()).toBeVisible();
-  });
-
-  test('should have clickable MetaMask button', async ({ page }) => {
-    await page.waitForTimeout(500);
-
-    const metaMaskButton = page.getByRole('button', { name: /MetaMask/i });
-    await expect(metaMaskButton).toBeEnabled();
   });
 });
 
@@ -37,6 +42,9 @@ test.describe('Wallet Connection Flow', () => {
     await injectMockEthereum(page, TEST_ACCOUNTS.account0.address);
     await page.goto('/');
     await page.waitForTimeout(500);
+
+    // Open connector panel first
+    await page.getByRole('button', { name: /接続する/i }).click();
 
     const metaMaskButton = page.getByRole('button', { name: /MetaMask/i });
 
@@ -73,7 +81,7 @@ test.describe('Network Handling', () => {
     await page.goto('/');
     await page.waitForTimeout(500);
 
-    // Page should load without network errors
-    await expect(page.locator('text=白山比咩神社')).toBeVisible();
+    // Page should load without network errors (header h1 visible)
+    await expect(page.locator('h1')).toBeVisible();
   });
 });
