@@ -346,18 +346,21 @@ export function MyPage() {
           )}
           {rangeInfo && <div className="sr-only" />}
 
-          {error && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="p-4 border border-shu/30 bg-shu/5"
-            >
-              <p className="font-mono text-xs text-shu">{humanizeError(error).title}</p>
-              {humanizeError(error).action && (
-                <p className="font-mono text-[10px] text-washi/40 mt-1">{humanizeError(error).action}</p>
-              )}
-            </motion.div>
-          )}
+          {error && (() => {
+            const friendly = humanizeError(error);
+            return (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="p-4 border border-shu/30 bg-shu/5"
+              >
+                <p className="font-mono text-xs text-shu">{friendly.title}</p>
+                {friendly.action && (
+                  <p className="font-mono text-[10px] text-washi/40 mt-1">{friendly.action}</p>
+                )}
+              </motion.div>
+            );
+          })()}
 
           {/* Collection Grid */}
           {isLoading ? (

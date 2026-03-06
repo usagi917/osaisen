@@ -226,18 +226,21 @@ export function WalletConnect() {
               )}
             </div>
 
-            {error && (
-              <div className="mt-4">
-                <p className="font-mono text-[10px] text-shu">
-                  {humanizeError(error).title}
-                </p>
-                {humanizeError(error).action && (
-                  <p className="font-mono text-[10px] text-washi/40 mt-1">
-                    {humanizeError(error).action}
+            {error && (() => {
+              const friendly = humanizeError(error);
+              return (
+                <div className="mt-4">
+                  <p className="font-mono text-[10px] text-shu">
+                    {friendly.title}
                   </p>
-                )}
-              </div>
-            )}
+                  {friendly.action && (
+                    <p className="font-mono text-[10px] text-washi/40 mt-1">
+                      {friendly.action}
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
           </motion.div>
         )}
       </AnimatePresence>

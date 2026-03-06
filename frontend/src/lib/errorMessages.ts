@@ -30,7 +30,7 @@ const ERROR_PATTERNS: { pattern: RegExp; error: FriendlyError }[] = [
     },
   },
   {
-    pattern: /network|timeout|failed to fetch|could not connect/i,
+    pattern: /network error|network request|timeout|failed to fetch|could not connect/i,
     error: {
       title: '通信エラー',
       message: 'ネットワークとの接続に問題が発生しました',

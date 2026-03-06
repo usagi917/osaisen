@@ -115,23 +115,29 @@ export function useGoshuinHistory({ userAddress, chainId }: UseGoshuinHistoryPro
         chunks.push({ fromBlock, toBlock });
       }
 
-      // 並列でイベント取得
-      const results = await Promise.all(
-        chunks.map(({ fromBlock, toBlock }) =>
-          publicClient.getContractEvents({
-            address: contracts.router,
-            abi: ROUTER_ABI,
-            eventName: 'Saisen',
-            args: { user: userAddress },
-            fromBlock,
-            toBlock,
-          })
-        )
-      );
+      // バッチ並列でイベント取得（RPCレート制限対策: 最大5並列）
+      const BATCH_SIZE = 5;
+      const allLogs: Array<{ args?: { minted?: boolean; monthId?: bigint } }> = [];
+      for (let i = 0; i < chunks.length; i += BATCH_SIZE) {
+        const batch = chunks.slice(i, i + BATCH_SIZE);
+        const batchResults = await Promise.all(
+          batch.map(({ fromBlock, toBlock }) =>
+            publicClient.getContractEvents({
+              address: contracts.router,
+              abi: ROUTER_ABI,
+              eventName: 'Saisen',
+              args: { user: userAddress },
+              fromBlock,
+              toBlock,
+            })
+          )
+        );
+        allLogs.push(...batchResults.flat());
+      }
 
       // 結果を集約
       const collected: bigint[] = [...cachedMonths];
-      results.flat().forEach((log) => {
+      allLogs.forEach((log) => {
         if (log.args?.minted && typeof log.args?.monthId === 'bigint') {
           collected.push(log.args.monthId);
         }

@@ -274,21 +274,24 @@ export function SaisenPage() {
                 onSaisen={handleSaisen}
               />
 
-              {saisenError && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-6 p-4 border border-shu/30 bg-shu/5"
-                  aria-live="polite"
-                >
-                  <p className="font-mono text-xs text-shu text-center">
-                    {humanizeError(saisenError).title}
-                  </p>
-                  <p className="font-mono text-[10px] text-washi/40 text-center mt-1">
-                    {humanizeError(saisenError).action}
-                  </p>
-                </motion.div>
-              )}
+              {saisenError && (() => {
+                const friendly = humanizeError(saisenError);
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-6 p-4 border border-shu/30 bg-shu/5"
+                    aria-live="polite"
+                  >
+                    <p className="font-mono text-xs text-shu text-center">
+                      {friendly.title}
+                    </p>
+                    <p className="font-mono text-[10px] text-washi/40 text-center mt-1">
+                      {friendly.action}
+                    </p>
+                  </motion.div>
+                );
+              })()}
             </motion.div>
           </motion.div>
         )}
